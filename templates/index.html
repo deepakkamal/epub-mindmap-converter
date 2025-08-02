@@ -1,0 +1,1999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>EPUB to Mindmap Converter - v2.0</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=2.0" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css?v=2.0">
+    
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #7c3aed;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 0;
+            color: var(--dark-color);
+        }
+        
+        .container {
+            max-width: 1200px;
+        }
+        
+        .main-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 3rem 2rem 2rem;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            margin: 0;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .content-section {
+            padding: 2rem;
+        }
+        
+        .api-key-section {
+            background: rgba(79, 70, 229, 0.05);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(79, 70, 229, 0.1);
+        }
+        
+        .upload-area {
+            border: 3px dashed var(--primary-color);
+            border-radius: 15px;
+            padding: 3rem;
+            text-align: center;
+            background: rgba(79, 70, 229, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--secondary-color);
+            background: rgba(124, 58, 237, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .upload-area.dragover {
+            border-color: var(--success-color);
+            background: rgba(16, 185, 129, 0.1);
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .upload-text {
+            font-size: 1.2rem;
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .btn-custom {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+            color: white;
+        }
+        
+        .progress-container {
+            display: none;
+            margin-top: 2rem;
+        }
+        
+        .progress {
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: #e5e7eb;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.3s ease;
+        }
+        
+        .status-message {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .status-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+        }
+        
+        .status-error {
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger-color);
+            color: var(--danger-color);
+        }
+        
+        .status-info {
+            background-color: rgba(79, 70, 229, 0.1);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .results-section {
+            display: none;
+            margin-top: 2rem;
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+        
+        .result-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .result-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .result-description {
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+        
+        .pricing-container {
+            background: rgba(16, 185, 129, 0.05);
+            border-radius: 10px;
+            padding: 1rem;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        
+        .model-option {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .model-option:hover {
+            border-color: var(--primary-color);
+            background: rgba(79, 70, 229, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.15);
+        }
+
+        .model-option.selected {
+            border-color: var(--primary-color);
+            background: rgba(79, 70, 229, 0.1);
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.2);
+        }
+
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .model-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .model-price {
+            font-size: 0.85rem;
+            color: var(--success-color);
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .model-description {
+            font-size: 0.75rem;
+            color: #6b7280;
+            line-height: 1.2;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .model-badge {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--primary-color);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .model-option.selected .model-badge {
+            opacity: 1;
+        }        .model-option.selected {
+            border-color: var(--primary-color);
+            background: rgba(79, 70, 229, 0.1);
+        }
+        
+        .model-name {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .model-price {
+            font-size: 0.9rem;
+            color: var(--success-color);
+            font-weight: 500;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e5e7eb;
+            padding: 0.75rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.25);
+        }
+        
+        .input-group-text {
+            background: var(--light-color);
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
+            padding: 1rem;
+        }
+        
+        .text-muted {
+            color: #6b7280 !important;
+        }
+        
+        .small {
+            font-size: 0.875rem;
+        }
+
+        /* Enhanced Progress Section Styles */
+        .progress-container {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .progress-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .progress-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            animation: pulse 2s infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% { 
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        .progress-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-subtitle {
+            color: #6b7280;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .progress {
+            height: 12px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 1.5rem;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-bar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+            animation: progressShine 2s infinite;
+        }
+
+        @keyframes progressShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .status-message {
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .status-message.status-info {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary-color);
+            border: 1px solid rgba(79, 70, 229, 0.2);
+        }
+
+        .status-message.status-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .status-message.status-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0.3;
+            transition: all 0.5s ease;
+            min-width: 80px;
+        }
+
+        .progress-step.active {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .progress-step.completed {
+            opacity: 1;
+            color: var(--success-color);
+        }
+
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active .step-icon {
+            background: var(--primary-color);
+            color: white;
+            animation: stepPulse 1.5s infinite;
+        }
+
+        .progress-step.completed .step-icon {
+            background: var(--success-color);
+            color: white;
+        }
+
+        @keyframes stepPulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 8px rgba(79, 70, 229, 0);
+            }
+        }
+
+        .step-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        .progress-step.active .step-label {
+            color: var(--primary-color);
+        }
+
+        .progress-step.completed .step-label {
+            color: var(--success-color);
+        }
+
+        /* Responsive design for mobile */
+        @media (max-width: 768px) {
+            .progress-container {
+                padding: 2rem 1rem;
+            }
+            
+            .progress-steps {
+                gap: 0.5rem;
+            }
+            
+            .progress-step {
+                min-width: 60px;
+            }
+            
+            .step-icon {
+                width: 32px;
+                height: 32px;
+            }
+            
+            .step-label {
+                font-size: 0.7rem;
+            }
+            
+            .progress-icon {
+                font-size: 2rem;
+            }
+            
+            .progress-title {
+                font-size: 1.25rem;
+            }
+            
+            .progress-subtitle {
+                font-size: 0.9rem;
+            }
+        }
+
+        .processing-animation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .processing-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            animation: processingBounce 1.4s infinite ease-in-out;
+        }
+
+        .processing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .processing-dot:nth-child(2) { animation-delay: -0.16s; }
+        .processing-dot:nth-child(3) { animation-delay: 0s; }
+
+        @keyframes processingBounce {
+            0%, 80%, 100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Chapter Downloads Grid */
+        .chapter-downloads-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .chapter-download-item {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chapter-download-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .chapter-download-item.processing {
+            border-color: var(--primary-color);
+            background: rgba(79, 70, 229, 0.05);
+        }
+
+        .chapter-download-item.completed {
+            border-color: var(--success-color);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .chapter-download-item.error {
+            border-color: var(--danger-color);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .chapter-download-status {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .chapter-download-status.processing {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .chapter-download-status.completed {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .chapter-download-status.error {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .chapter-download-status.pending {
+            background: #6b7280;
+            color: white;
+        }
+
+        .chapter-download-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+            padding-right: 5rem; /* Space for status badge */
+        }
+
+        .chapter-download-message {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+
+        .chapter-download-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .chapter-download-btn {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .chapter-download-btn:hover {
+            background: var(--secondary-color);
+            color: white;
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+
+        .chapter-download-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .chapter-download-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @media (max-width: 768px) {
+            .chapter-downloads-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .chapter-download-item {
+                padding: 1rem;
+            }
+            
+            .chapter-download-title {
+                font-size: 1rem;
+                padding-right: 4rem;
+            }
+        }
+
+        /* Chapter Selection Styles */
+        .chapters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .chapter-item {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .chapter-item:hover {
+            border-color: var(--primary-color);
+            background: rgba(79, 70, 229, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.15);
+        }
+
+        .chapter-item.selected {
+            border-color: var(--primary-color);
+            background: rgba(79, 70, 229, 0.1);
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.2);
+        }
+
+        .chapter-checkbox {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            transform: scale(1.2);
+        }
+
+        .chapter-title {
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 0.85rem;
+            line-height: 1.3;
+            margin-bottom: 0.5rem;
+            padding-right: 2rem;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .chapter-preview {
+            color: #6b7280;
+            font-size: 0.75rem;
+            line-height: 1.2;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            flex-grow: 1;
+        }
+
+        .chapter-meta {
+            font-size: 0.7rem;
+            color: #9ca3af;
+            margin-top: auto;
+            padding-top: 0.5rem;
+        }
+
+        .select-all-container {
+            background: rgba(79, 70, 229, 0.05);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(79, 70, 229, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-container">
+            <!-- Header -->
+            <div class="header">
+                <h1><i class="fas fa-book-open"></i> EPUB to Mindmap Converter</h1>
+                <p>Transform your EPUB books into interactive mindmaps with ease</p>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="content-section" id="upload-section">
+                <!-- API Key Configuration -->
+                <div class="api-key-section" id="api-key-section">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h4><i class="fas fa-key"></i> OpenAI API Configuration</h4>
+                            <div class="form-group">
+                                <label class="form-label">OpenAI API Key</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="api-key" placeholder="sk-..." 
+                                           autocomplete="new-password">
+                                    <button class="btn btn-outline-secondary" type="button" id="toggle-key-visibility">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-custom" type="button" id="validate-key">
+                                        <i class="fas fa-check"></i> Validate
+                                    </button>
+                                </div>
+                                <small class="text-muted">
+                                    Get your API key from <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a>
+                                </small>
+                                <div id="key-status" class="mt-2"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <h5><i class="fas fa-info-circle"></i> Model Pricing</h5>
+                            <div id="pricing-info" class="pricing-container">
+                                <div class="text-center">
+                                    <div class="loading"></div>
+                                    <p class="small mt-2 mb-0">Loading affordable models...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Model Selection -->
+                    <div class="mt-3" id="model-selection" style="display: none;">
+                        <h5><i class="fas fa-robot"></i> Select AI Model</h5>
+                        <div id="model-options">
+                            <!-- Models will be populated here -->
+                        </div>
+                        <input type="hidden" id="selected-model" value="">
+                    </div>
+                </div>
+
+                <!-- File Upload Area -->
+                <div class="upload-area" id="upload-area">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <div class="upload-text">
+                        <strong>Drop your EPUB file here</strong> or click to browse
+                    </div>
+                    <p class="text-muted">Supports .epub files up to 50MB</p>
+                    <input type="file" id="file-input" class="file-input" accept=".epub">
+                    <button type="button" class="btn btn-custom mt-3" id="browse-btn">
+                        <i class="fas fa-folder-open"></i> Browse Files
+                    </button>
+                </div>
+
+                <!-- Enhanced Progress Section -->
+                <div class="progress-container" id="progress-container">
+                    <div class="progress-header">
+                        <div class="progress-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="progress-title" id="progress-title">Creating Your Mindmap</div>
+                        <div class="progress-subtitle" id="progress-subtitle">
+                            Our AI is analyzing your content and generating comprehensive mindmaps...
+                        </div>
+                    </div>
+                    
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    
+                    <div class="status-message" id="status-message"></div>
+                    
+                    <div class="processing-animation">
+                        <div class="processing-dot"></div>
+                        <div class="processing-dot"></div>
+                        <div class="processing-dot"></div>
+                    </div>
+                    
+                    <div class="progress-steps" id="progress-steps">
+                        <div class="progress-step active" id="step-analyzing">
+                            <div class="step-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <div class="step-label">Analyzing</div>
+                        </div>
+                        <div class="progress-step" id="step-processing">
+                            <div class="step-icon">
+                                <i class="fas fa-cogs"></i>
+                            </div>
+                            <div class="step-label">Processing</div>
+                        </div>
+                        <div class="progress-step" id="step-generating">
+                            <div class="step-icon">
+                                <i class="fas fa-magic"></i>
+                            </div>
+                            <div class="step-label">Generating</div>
+                        </div>
+                        <div class="progress-step" id="step-finalizing">
+                            <div class="step-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="step-label">Finalizing</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="content-section results-section" id="results-section">
+                <h3><i class="fas fa-chart-network"></i> Generated Mindmaps</h3>
+                <div id="results-container">
+                    <!-- Results will be populated here -->
+                </div>
+            </div>
+
+            <!-- Individual Chapter Downloads Section -->
+            <div class="content-section" id="chapter-downloads-section" style="display: none;">
+                <h3><i class="fas fa-download"></i> Download Individual Chapters</h3>
+                <div class="mb-3">
+                    <p class="text-muted">Download mindmaps for individual chapters as they are completed:</p>
+                </div>
+                
+                <!-- Chapter Download Grid -->
+                <div id="chapter-downloads-grid" class="chapter-downloads-grid">
+                    <!-- Individual chapter downloads will appear here -->
+                </div>
+                
+                <!-- Combined Download -->
+                <div class="mt-4 text-center">
+                    <button type="button" class="btn btn-secondary me-2" onclick="goBackToUpload()">
+                        <i class="fas fa-arrow-left"></i> Back to Upload
+                    </button>
+                    <button type="button" class="btn btn-custom btn-lg me-2" id="download-all-btn" onclick="downloadCombined()" style="display: none;">
+                        <i class="fas fa-download"></i> Download Combined (Markdown)
+                    </button>
+                    <button type="button" class="btn btn-primary btn-lg" id="download-all-docx-btn" onclick="downloadCombinedDocx()" style="display: none;">
+                        <i class="fas fa-file-word"></i> Download Combined (DOCX)
+                    </button>
+                    <button type="button" class="btn btn-danger btn-lg" id="download-all-pdf-btn" onclick="downloadCombinedPdf()" style="display: none;">
+                        <i class="fas fa-file-pdf"></i> Download Combined (PDF)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chapter Selection Section -->
+            <div class="content-section" id="chapter-selection-section" style="display: none;">
+                <h3><i class="fas fa-list"></i> Select Chapters</h3>
+                <div class="mb-3">
+                    <p class="text-muted">Choose which chapters you want to convert to mindmaps:</p>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> 
+                        Using AI Model: <strong id="selected-model-display"></strong> | 
+                        Mindmap Type: <strong id="selected-type-display">Comprehensive</strong>
+                    </div>
+                </div>
+
+                <!-- Chapter List -->
+                <div id="chapters-container">
+                    <!-- Chapters will be populated here -->
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="mt-4">
+                    <button type="button" class="btn btn-secondary me-2" onclick="goBackToUpload()">
+                        <i class="fas fa-arrow-left"></i> Back to Upload
+                    </button>
+                    <button type="button" class="btn btn-custom" onclick="generateMindmaps()" id="generate-btn" disabled>
+                        <i class="fas fa-magic"></i> Generate Mindmaps
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Global variables
+        let selectedFile = null;
+        let selectedModel = '';
+        let apiKey = '';
+
+        // DOM elements
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('file-input');
+        const browseBtn = document.getElementById('browse-btn');
+        const progressContainer = document.getElementById('progress-container');
+        const progressBar = document.querySelector('.progress-bar');
+        const statusMessage = document.getElementById('status-message');
+        const resultsSection = document.getElementById('results-section');
+        const resultsContainer = document.getElementById('results-container');
+        const apiKeyInput = document.getElementById('api-key');
+        const validateKeyBtn = document.getElementById('validate-key');
+        const toggleKeyBtn = document.getElementById('toggle-key-visibility');
+        const keyStatus = document.getElementById('key-status');
+        const modelSelection = document.getElementById('model-selection');
+        const modelOptions = document.getElementById('model-options');
+        const pricingInfo = document.getElementById('pricing-info');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAffordableModels();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // File upload events
+            uploadArea.addEventListener('click', (e) => {
+                // Don't trigger file input if clicking on buttons or if file is already selected
+                if (e.target.tagName === 'BUTTON' || e.target.closest('button') || selectedFile) {
+                    return;
+                }
+                fileInput.click();
+            });
+            browseBtn.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', handleFileSelect);
+
+            // Drag and drop events
+            uploadArea.addEventListener('dragover', handleDragOver);
+            uploadArea.addEventListener('dragleave', handleDragLeave);
+            uploadArea.addEventListener('drop', handleFileDrop);
+
+            // API key events
+            validateKeyBtn.addEventListener('click', validateApiKey);
+            toggleKeyBtn.addEventListener('click', toggleKeyVisibility);
+            apiKeyInput.addEventListener('input', function() {
+                keyStatus.innerHTML = '';
+                modelSelection.style.display = 'none';
+            });
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        }
+
+        function handleFileDrop(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.name.endsWith('.epub')) {
+                    selectedFile = file;
+                    updateUploadArea();
+                } else {
+                    showStatus('Please select an EPUB file.', 'error');
+                }
+            }
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                selectedFile = file;
+                updateUploadArea();
+            }
+        }
+
+        function updateUploadArea() {
+            if (selectedFile) {
+                uploadArea.innerHTML = `
+                    <div class="upload-icon">
+                        <i class="fas fa-book text-success"></i>
+                    </div>
+                    <div class="upload-text">
+                        <strong>${selectedFile.name}</strong>
+                    </div>
+                    <p class="text-muted">File size: ${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB</p>
+                    <button type="button" class="btn btn-custom mt-3" onclick="processFile()">
+                        <i class="fas fa-cogs"></i> Convert to Chapters
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary mt-3 ms-2" onclick="resetUpload()">
+                        <i class="fas fa-times"></i> Remove
+                    </button>
+                `;
+            }
+        }
+
+        function resetUpload() {
+            selectedFile = null;
+            fileInput.value = '';
+            uploadArea.innerHTML = `
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <div class="upload-text">
+                    <strong>Drop your EPUB file here</strong> or click to browse
+                </div>
+                <p class="text-muted">Supports .epub files up to 50MB</p>
+                <button type="button" class="btn btn-custom mt-3" id="browse-btn">
+                    <i class="fas fa-folder-open"></i> Browse Files
+                </button>
+            `;
+            // Re-attach event listener
+            document.getElementById('browse-btn').addEventListener('click', () => fileInput.click());
+        }
+
+        function toggleKeyVisibility() {
+            const input = apiKeyInput;
+            const icon = toggleKeyBtn.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        }
+
+        async function validateApiKey() {
+            const key = apiKeyInput.value.trim();
+            if (!key) {
+                showKeyStatus('Please enter an API key', 'error');
+                return;
+            }
+
+            validateKeyBtn.innerHTML = '<div class="loading"></div> Validating...';
+            validateKeyBtn.disabled = true;
+
+            try {
+                const response = await fetch('/validate_api_key', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ api_key: key })
+                });
+
+                const result = await response.json();
+                
+                if (result.valid) {
+                    apiKey = key;
+                    showKeyStatus('✅ API key is valid', 'success');
+                    
+                    console.log('API key validated, loading models...');
+                    // Load models and show selection
+                    await loadAffordableModels();
+                    console.log('Models loaded, showing model selection...');
+                    modelSelection.style.display = 'block';
+                    console.log('Model selection display set to block');
+                    
+                    // Scroll to model selection
+                    modelSelection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else {
+                    showKeyStatus('❌ Invalid API key: ' + result.error, 'error');
+                    modelSelection.style.display = 'none';
+                }
+            } catch (error) {
+                showKeyStatus('❌ Error validating API key: ' + error.message, 'error');
+                modelSelection.style.display = 'none';
+            } finally {
+                validateKeyBtn.innerHTML = '<i class="fas fa-check"></i> Validate';
+                validateKeyBtn.disabled = false;
+            }
+        }
+
+        function showKeyStatus(message, type) {
+            keyStatus.innerHTML = `<div class="alert alert-${type === 'error' ? 'danger' : 'success'} small">${message}</div>`;
+        }
+
+        async function loadAffordableModels() {
+            try {
+                console.log('Loading affordable models...');
+                const response = await fetch('/get_affordable_models');
+                const data = await response.json();
+                console.log('Models data received:', data);
+                
+                if (data.models && data.models.length > 0) {
+                    // Store models globally for use in chapter selection
+                    window.modelOptions = data.models;
+                    
+                    displayPricingInfo(data.models);
+                    populateModelOptions(data.models);
+                    console.log('Models populated successfully');
+                } else {
+                    console.warn('No models found');
+                    pricingInfo.innerHTML = `
+                        <div class="text-center text-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p class="small mt-2 mb-0">No affordable models found (under $11/1M tokens)</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading models:', error);
+                pricingInfo.innerHTML = `
+                    <div class="text-center text-danger">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p class="small mt-2 mb-0">Error loading models</p>
+                    </div>
+                `;
+            }
+        }
+
+        function displayPricingInfo(models) {
+            const count = models.length;
+            const cheapest = models.reduce((min, model) => 
+                model.output_price < min.output_price ? model : min
+            );
+            
+            pricingInfo.innerHTML = `
+                <div class="text-center">
+                    <div class="mb-2">
+                        <strong>${count}</strong> affordable models available
+                    </div>
+                    <div class="small text-muted">
+                        Starting from <strong>$${cheapest.output_price}/1M tokens</strong>
+                    </div>
+                </div>
+            `;
+        }
+
+        function populateModelOptions(models) {
+            console.log('Populating model options with:', models);
+            // Create grid container
+            modelOptions.innerHTML = `<div class="model-grid">${models.map(model => `
+                <div class="model-option" data-model-id="${model.id}" onclick="selectModel('${model.id}')">
+                    <div class="model-badge">Selected</div>
+                    <div>
+                        <div class="model-name">${model.name || model.id}</div>
+                        <div class="model-price">$${model.output_price}/1M tokens</div>
+                        <div class="model-description">${model.description || 'AI language model for text generation'}</div>
+                    </div>
+                </div>
+            `).join('')}</div>`;
+            
+            console.log('Model options HTML updated');
+            
+            // Select first model by default
+            if (models.length > 0) {
+                selectModel(models[0].id);
+                console.log('First model selected:', models[0].id);
+            }
+        }
+
+        function selectModel(modelId) {
+            console.log('Selecting model:', modelId);
+            
+            // Remove selection from all options
+            document.querySelectorAll('.model-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Add selection to clicked option - use data attribute for more reliable matching
+            const selectedOption = document.querySelector(`[data-model-id="${modelId}"]`);
+            if (selectedOption) {
+                selectedOption.classList.add('selected');
+                console.log('Model option selected successfully');
+            } else {
+                console.warn('Model option not found for ID:', modelId);
+                // Fallback: try to match by content
+                const fallbackOption = [...document.querySelectorAll('.model-option')]
+                    .find(option => {
+                        const modelName = option.querySelector('.model-name').textContent;
+                        return modelName.includes(modelId) || modelName === modelId;
+                    });
+                if (fallbackOption) {
+                    fallbackOption.classList.add('selected');
+                    console.log('Model option selected via fallback');
+                }
+            }
+            
+            selectedModel = modelId;
+            document.getElementById('selected-model').value = modelId;
+            console.log('Selected model set to:', selectedModel);
+        }
+
+        async function processFile() {
+            if (!selectedFile) {
+                showStatus('Please select an EPUB file first.', 'error');
+                return;
+            }
+
+            if (!apiKey) {
+                showStatus('Please validate your API key first.', 'error');
+                return;
+            }
+
+            if (!selectedModel) {
+                showStatus('Please select an AI model first.', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            formData.append('api_key', apiKey);
+            formData.append('model', selectedModel);
+
+            progressContainer.style.display = 'block';
+            
+            // Reset progress steps for EPUB processing
+            document.querySelectorAll('.progress-step').forEach(step => {
+                step.classList.remove('active', 'completed');
+            });
+            document.getElementById('step-analyzing').classList.add('active');
+            
+            // Update progress text for EPUB processing
+            document.getElementById('progress-title').textContent = 'Processing EPUB File';
+            document.getElementById('progress-subtitle').textContent = 'Extracting and analyzing chapters from your EPUB...';
+            
+            updateProgress(5, 'Uploading and processing EPUB file...');
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    updateProgress(15, 'EPUB uploaded successfully, extracting chapters...');
+                    // Start monitoring the processing status
+                    monitorProgress();
+                } else {
+                    showStatus('Upload failed: ' + (result.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                showStatus('Error processing file: ' + error.message, 'error');
+            }
+        }
+
+        function updateProgress(percent, message) {
+            const progressBar = document.querySelector('.progress-bar');
+            const statusMessage = document.getElementById('status-message');
+            const progressTitle = document.getElementById('progress-title');
+            const progressSubtitle = document.getElementById('progress-subtitle');
+            
+            // Update progress bar
+            progressBar.style.width = percent + '%';
+            
+            // Update status message
+            showStatus(message, 'info');
+            
+            // Update progress steps based on percentage
+            updateProgressSteps(percent);
+            
+            // Update title and subtitle based on progress
+            updateProgressText(percent, message);
+        }
+
+        function updateProgressSteps(percent) {
+            const steps = {
+                'step-analyzing': { min: 0, max: 25 },
+                'step-processing': { min: 25, max: 50 },
+                'step-generating': { min: 50, max: 75 },
+                'step-finalizing': { min: 75, max: 100 }
+            };
+            
+            Object.entries(steps).forEach(([stepId, range]) => {
+                const stepElement = document.getElementById(stepId);
+                
+                if (percent >= range.max) {
+                    stepElement.classList.remove('active');
+                    stepElement.classList.add('completed');
+                } else if (percent >= range.min) {
+                    stepElement.classList.add('active');
+                    stepElement.classList.remove('completed');
+                } else {
+                    stepElement.classList.remove('active', 'completed');
+                }
+            });
+        }
+
+        function updateProgressText(percent, message) {
+            const progressTitle = document.getElementById('progress-title');
+            const progressSubtitle = document.getElementById('progress-subtitle');
+            
+            if (percent <= 25) {
+                progressTitle.textContent = 'Analyzing Content';
+                progressSubtitle.textContent = 'Reading and understanding your EPUB structure...';
+            } else if (percent <= 50) {
+                progressTitle.textContent = 'Processing Chapters';
+                progressSubtitle.textContent = 'Breaking down content into digestible sections...';
+            } else if (percent <= 75) {
+                progressTitle.textContent = 'Generating Mindmaps';
+                progressSubtitle.textContent = 'AI is creating comprehensive visual representations...';
+            } else if (percent < 100) {
+                progressTitle.textContent = 'Finalizing Results';
+                progressSubtitle.textContent = 'Preparing your mindmaps for download...';
+            } else {
+                progressTitle.textContent = 'Complete!';
+                progressSubtitle.textContent = 'Your mindmaps are ready for download.';
+            }
+        }
+
+        function handleComplete(data) {
+            // Stop chapter monitoring
+            if (window.chapterMonitoringInterval) {
+                clearInterval(window.chapterMonitoringInterval);
+            }
+            
+            if (data.completion_type === 'epub_processed') {
+                // EPUB processing completed - show chapters
+                // Don't show "Complete!" yet, just update the title
+                document.getElementById('progress-title').textContent = 'EPUB Processing Complete!';
+                document.getElementById('progress-subtitle').textContent = 'Your EPUB has been successfully converted to chapters.';
+                showStatus('✅ EPUB converted to chapters successfully! Please select chapters to convert to mindmaps.', 'success');
+                setTimeout(() => {
+                    showChapterSelection();
+                }, 1500); // Brief delay to show completion state
+            } else if (data.completion_type === 'mindmaps_generated') {
+                // Mindmap generation completed - show full completion
+                updateProgress(100, 'Conversion complete!');
+                
+                // Mark all steps as completed
+                document.querySelectorAll('.progress-step').forEach(step => {
+                    step.classList.remove('active');
+                    step.classList.add('completed');
+                });
+                
+                document.getElementById('progress-title').textContent = 'Complete!';
+                document.getElementById('progress-subtitle').textContent = 'Your mindmaps are ready for download.';
+                showStatus('✅ Mindmaps generated successfully!', 'success');
+                
+                // Show the download buttons
+                document.getElementById('download-all-btn').style.display = 'inline-block';
+                document.getElementById('download-all-docx-btn').style.display = 'inline-block';
+                document.getElementById('download-all-pdf-btn').style.display = 'inline-block';
+                
+                setTimeout(() => {
+                    // Scroll to chapter downloads
+                    document.getElementById('chapter-downloads-section').scrollIntoView({ behavior: 'smooth' });
+                }, 1500); // Brief delay to show completion state
+            }
+        }
+
+        async function showChapterSelection() {
+            try {
+                // Fetch chapters from the server
+                const response = await fetch('/chapters');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch chapters');
+                }
+                
+                const chaptersData = await response.json();
+                console.log('DEBUG: Received chapters data:', chaptersData);
+                console.log('DEBUG: Chapters type:', typeof chaptersData.chapters);
+                console.log('DEBUG: Chapters:', chaptersData.chapters);
+                
+                // Update the selected model display
+                document.getElementById('selected-model-display').textContent = selectedModel;
+                document.getElementById('selected-type-display').textContent = 'Comprehensive';
+                
+                // Ensure chapters is an array
+                let chapters = chaptersData.chapters;
+                if (!Array.isArray(chapters)) {
+                    console.log('DEBUG: Converting chapters from object to array');
+                    if (typeof chapters === 'object' && chapters !== null) {
+                        // Convert object to array
+                        chapters = Object.values(chapters);
+                    } else {
+                        chapters = [];
+                    }
+                }
+                
+                populateChapters(chapters);
+                
+                // Hide upload section and show chapter selection
+                document.getElementById('upload-section').style.display = 'none';
+                document.getElementById('chapter-selection-section').style.display = 'block';
+                
+                // Scroll to chapter selection
+                document.getElementById('chapter-selection-section').scrollIntoView({ behavior: 'smooth' });
+                
+            } catch (error) {
+                showStatus('Error loading chapters: ' + error.message, 'error');
+            }
+        }
+
+        function populateChapters(chapters) {
+            const container = document.getElementById('chapters-container');
+            
+            // Add select all option
+            container.innerHTML = `
+                <div class="select-all-container">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="select-all" onchange="toggleSelectAll()">
+                        <label class="form-check-label fw-bold" for="select-all">
+                            Select All Chapters (${chapters.length} total)
+                        </label>
+                    </div>
+                </div>
+                <div class="chapters-grid">
+                </div>
+            `;
+            
+            const grid = container.querySelector('.chapters-grid');
+            
+            // Add individual chapters to grid
+            chapters.forEach((chapter, index) => {
+                const chapterDiv = document.createElement('div');
+                chapterDiv.className = 'chapter-item';
+                chapterDiv.onclick = () => toggleChapterSelection(chapter.filename);
+                
+                chapterDiv.innerHTML = `
+                    <input class="form-check-input chapter-checkbox" type="checkbox" 
+                           id="chapter-${index}" value="${chapter.filename}" 
+                           onchange="updateChapterSelection()">
+                    <div class="chapter-title">${chapter.title || chapter.filename}</div>
+                    <div class="chapter-preview">${chapter.preview || 'No preview available'}</div>
+                    <div class="chapter-meta">
+                        ${chapter.word_count ? chapter.word_count + ' words' : ''} • 
+                        ${chapter.filename.replace(/^\d+_/, '').replace(/\.md$/, '')}
+                    </div>
+                `;
+                
+                grid.appendChild(chapterDiv);
+            });
+        }
+
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('select-all');
+            const chapterCheckboxes = document.querySelectorAll('.chapter-checkbox');
+            
+            chapterCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+                const chapterItem = checkbox.closest('.chapter-item');
+                if (selectAllCheckbox.checked) {
+                    chapterItem.classList.add('selected');
+                } else {
+                    chapterItem.classList.remove('selected');
+                }
+            });
+            
+            updateChapterSelection();
+        }
+
+        function toggleChapterSelection(filename) {
+            const checkbox = document.querySelector(`input[value="${filename}"]`);
+            checkbox.checked = !checkbox.checked;
+            updateChapterSelection();
+        }
+
+        function updateChapterSelection() {
+            const selectedCheckboxes = document.querySelectorAll('.chapter-checkbox:checked');
+            const generateBtn = document.getElementById('generate-btn');
+            
+            // Update visual selection
+            document.querySelectorAll('.chapter-item').forEach(item => {
+                const checkbox = item.querySelector('.chapter-checkbox');
+                if (checkbox.checked) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+            
+            // Update select all checkbox
+            const allCheckboxes = document.querySelectorAll('.chapter-checkbox');
+            const selectAllCheckbox = document.getElementById('select-all');
+            selectAllCheckbox.checked = selectedCheckboxes.length === allCheckboxes.length;
+            selectAllCheckbox.indeterminate = selectedCheckboxes.length > 0 && selectedCheckboxes.length < allCheckboxes.length;
+            
+            // Enable/disable generate button
+            generateBtn.disabled = selectedCheckboxes.length === 0;
+        }
+
+        async function generateMindmaps() {
+            const selectedChapters = Array.from(document.querySelectorAll('.chapter-checkbox:checked'))
+                .map(checkbox => checkbox.value);
+            
+            if (selectedChapters.length === 0) {
+                showStatus('Please select at least one chapter.', 'error');
+                return;
+            }
+            
+            try {
+                // Hide chapter selection and show progress
+                document.getElementById('chapter-selection-section').style.display = 'none';
+                document.getElementById('upload-section').style.display = 'block';
+                progressContainer.style.display = 'block';
+                
+                // Show chapter downloads section
+                document.getElementById('chapter-downloads-section').style.display = 'block';
+                initializeChapterDownloads(selectedChapters);
+                
+                // Reset progress steps
+                document.querySelectorAll('.progress-step').forEach(step => {
+                    step.classList.remove('active', 'completed');
+                });
+                document.getElementById('step-analyzing').classList.add('active');
+                
+                updateProgress(5, `Starting mindmap generation for ${selectedChapters.length} chapter(s)...`);
+                
+                const response = await fetch('/process-mindmaps', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        selected_chapters: selectedChapters,
+                        ai_model: selectedModel,  // Use the originally selected model
+                        mindmap_type: 'comprehensive',  // Use fixed type
+                        api_key: apiKey  // Send API key with request (no server storage)
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to start mindmap generation');
+                }
+                
+                updateProgress(10, 'Mindmap generation started successfully...');
+                
+                // Start monitoring progress and individual chapters
+                monitorProgress();
+                monitorChapterProgress();
+                
+            } catch (error) {
+                showStatus('Error starting mindmap generation: ' + error.message, 'error');
+            }
+        }
+
+        function initializeChapterDownloads(selectedChapters) {
+            const grid = document.getElementById('chapter-downloads-grid');
+            grid.innerHTML = '';
+            
+            selectedChapters.forEach(chapterFile => {
+                const chapterName = chapterFile.replace(/\.(md|txt)$/, '');
+                const displayName = chapterName.replace(/_/g, ' ').replace(/-/g, ' ').replace(/^\d+\s*/, '').trim();
+                
+                const chapterDiv = document.createElement('div');
+                chapterDiv.className = 'chapter-download-item pending';
+                chapterDiv.id = `download-${chapterName}`;
+                chapterDiv.innerHTML = `
+                    <div class="chapter-download-status pending">Pending</div>
+                    <div class="chapter-download-title">${displayName}</div>
+                    <div class="chapter-download-message">Waiting to be processed...</div>
+                    <div class="chapter-download-actions">
+                        <button class="chapter-download-btn me-1" disabled>
+                            <i class="fas fa-download"></i> MD
+                        </button>
+                        <button class="chapter-download-btn me-1" disabled>
+                            <i class="fas fa-file-word"></i> DOCX
+                        </button>
+                        <button class="chapter-download-btn" disabled>
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </button>
+                    </div>
+                `;
+                
+                grid.appendChild(chapterDiv);
+            });
+        }
+
+        function updateChapterDownload(chapterName, status, message, hasDownload = false) {
+            const chapterDiv = document.getElementById(`download-${chapterName}`);
+            if (!chapterDiv) return;
+            
+            // Update classes
+            chapterDiv.className = `chapter-download-item ${status}`;
+            
+            // Update status badge
+            const statusBadge = chapterDiv.querySelector('.chapter-download-status');
+            statusBadge.className = `chapter-download-status ${status}`;
+            statusBadge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+            
+            // Update message
+            const messageDiv = chapterDiv.querySelector('.chapter-download-message');
+            messageDiv.textContent = message;
+            
+            // Update download buttons
+            const downloadBtns = chapterDiv.querySelectorAll('.chapter-download-btn');
+            const mdBtn = downloadBtns[0];
+            const docxBtn = downloadBtns[1];
+            const pdfBtn = downloadBtns[2];
+            
+            if (hasDownload && status === 'completed') {
+                // Enable MD download button
+                mdBtn.disabled = false;
+                mdBtn.onclick = () => downloadChapter(chapterName);
+                mdBtn.innerHTML = '<i class="fas fa-download"></i> MD';
+                
+                // Enable DOCX download button
+                docxBtn.disabled = false;
+                docxBtn.onclick = () => downloadChapterDocx(chapterName);
+                docxBtn.innerHTML = '<i class="fas fa-file-word"></i> DOCX';
+                
+                // Enable PDF download button
+                pdfBtn.disabled = false;
+                pdfBtn.onclick = () => downloadChapterPdf(chapterName);
+                pdfBtn.innerHTML = '<i class="fas fa-file-pdf"></i> PDF';
+            } else if (status === 'processing') {
+                mdBtn.disabled = true;
+                mdBtn.innerHTML = '<div class="chapter-download-spinner"></div> Processing';
+                docxBtn.disabled = true;
+                docxBtn.innerHTML = '<div class="chapter-download-spinner"></div> Processing';
+                pdfBtn.disabled = true;
+                pdfBtn.innerHTML = '<div class="chapter-download-spinner"></div> Processing';
+            } else if (status === 'error') {
+                mdBtn.disabled = true;
+                mdBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Failed';
+                docxBtn.disabled = true;
+                docxBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Failed';
+                pdfBtn.disabled = true;
+                pdfBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Failed';
+            }
+        }
+
+        function downloadChapter(chapterName) {
+            window.open(`/download-chapter/${chapterName}`, '_blank');
+        }
+
+        function downloadChapterDocx(chapterName) {
+            window.open(`/download-chapter-docx/${chapterName}`, '_blank');
+        }
+
+        function downloadCombined() {
+            window.open('/download-combined', '_blank');
+        }
+
+        async function downloadCombinedDocx() {
+            try {
+                const response = await fetch('/download-combined-docx');
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    showStatus(`DOCX Download Error: ${errorData.error}`, 'error');
+                    return;
+                }
+                // If successful, trigger download
+                window.open('/download-combined-docx', '_blank');
+            } catch (error) {
+                showStatus('DOCX Download Error: Could not connect to server', 'error');
+            }
+        }
+
+        async function downloadChapterDocx(chapterName) {
+            try {
+                const response = await fetch(`/download-chapter-docx/${chapterName}`);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    showStatus(`DOCX Download Error: ${errorData.error}`, 'error');
+                    return;
+                }
+                // If successful, trigger download
+                window.open(`/download-chapter-docx/${chapterName}`, '_blank');
+            } catch (error) {
+                showStatus('DOCX Download Error: Could not connect to server', 'error');
+            }
+        }
+
+        async function downloadCombinedPdf() {
+            try {
+                const response = await fetch('/download-combined-pdf');
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    showStatus(`PDF Download Error: ${errorData.error}`, 'error');
+                    return;
+                }
+                // If successful, trigger download
+                window.open('/download-combined-pdf', '_blank');
+            } catch (error) {
+                showStatus('PDF Download Error: Could not connect to server', 'error');
+            }
+        }
+
+        async function downloadChapterPdf(chapterName) {
+            try {
+                const response = await fetch(`/download-chapter-pdf/${chapterName}`);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    showStatus(`PDF Download Error: ${errorData.error}`, 'error');
+                    return;
+                }
+                // If successful, trigger download
+                window.open(`/download-chapter-pdf/${chapterName}`, '_blank');
+            } catch (error) {
+                showStatus('PDF Download Error: Could not connect to server', 'error');
+            }
+        }
+
+        async function monitorChapterProgress() {
+            const checkChapterStatus = async () => {
+                try {
+                    const response = await fetch('/chapter-status');
+                    const data = await response.json();
+                    
+                    if (data.chapter_status) {
+                        Object.entries(data.chapter_status).forEach(([chapterName, status]) => {
+                            updateChapterDownload(
+                                chapterName, 
+                                status.status, 
+                                status.message, 
+                                status.has_download
+                            );
+                        });
+                    }
+                    
+                    // Show combined download when all chapters are done
+                    if (data.completed_chapters && data.completed_chapters.length > 0) {
+                        document.getElementById('download-all-btn').style.display = 'inline-block';
+                        document.getElementById('download-all-docx-btn').style.display = 'inline-block';
+                document.getElementById('download-all-pdf-btn').style.display = 'inline-block';
+                    }
+                    
+                } catch (error) {
+                    console.error('Error checking chapter status:', error);
+                }
+            };
+            
+            // Check status every 2 seconds
+            const chapterStatusInterval = setInterval(checkChapterStatus, 2000);
+            
+            // Stop monitoring when main progress is complete
+            const stopMonitoring = () => {
+                clearInterval(chapterStatusInterval);
+            };
+            
+            // Check immediately
+            checkChapterStatus();
+            
+            // Store interval for cleanup
+            window.chapterMonitoringInterval = chapterStatusInterval;
+        }
+
+        function goBackToUpload() {
+            document.getElementById('chapter-selection-section').style.display = 'none';
+            document.getElementById('chapter-downloads-section').style.display = 'none';
+            document.getElementById('results-section').style.display = 'none';
+            document.getElementById('upload-section').style.display = 'block';
+            progressContainer.style.display = 'none';
+            
+            // Stop any ongoing monitoring
+            if (window.chapterMonitoringInterval) {
+                clearInterval(window.chapterMonitoringInterval);
+            }
+            
+            document.getElementById('upload-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showResults(data) {
+            // Display results
+            resultsSection.style.display = 'block';
+            resultsContainer.innerHTML = `
+                <div class="result-card">
+                    <div class="result-title">
+                        <i class="fas fa-download"></i> Download Results
+                    </div>
+                    <div class="result-description">
+                        Your mindmaps have been generated successfully. Click below to download.
+                    </div>
+                    <a href="/download/${data.download_id}" class="btn btn-custom">
+                        <i class="fas fa-download"></i> Download ZIP
+                    </a>
+                </div>
+            `;
+            
+            // Scroll to results
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showStatus(message, type) {
+            statusMessage.innerHTML = message;
+            statusMessage.className = `status-message status-${type}`;
+            statusMessage.style.display = 'block';
+        }
+
+        function monitorProgress() {
+            const checkStatus = async () => {
+                try {
+                    const response = await fetch('/status');
+                    const data = await response.json();
+                    
+                    if (data.progress !== undefined) {
+                        updateProgress(data.progress, data.message || 'Processing...');
+                    }
+                    
+                    if (data.completed) {
+                        clearInterval(statusInterval);
+                        handleComplete(data);
+                    } else if (data.error) {
+                        clearInterval(statusInterval);
+                        showStatus('Error: ' + data.error, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error checking status:', error);
+                }
+            };
+            
+            // Check status every 2 seconds
+            const statusInterval = setInterval(checkStatus, 2000);
+            
+            // Also check immediately
+            checkStatus();
+        }
+    </script>
+</body>
+</html>

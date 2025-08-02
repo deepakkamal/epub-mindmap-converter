@@ -1,0 +1,87 @@
+# Deployment files and sensitive data
+.env
+.env.local
+.env.production
+.env.development
+*.env
+!.env.example
+
+# API Keys and sensitive configuration
+config.json
+secrets.json
+api_keys.txt
+credentials.json
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Cache files
+*.pkl
+*.cache
+pricing_cache.pkl
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# User uploads and outputs
+uploads/
+outputs/
+static/temp/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Temporary files
+temp/
+tmp/

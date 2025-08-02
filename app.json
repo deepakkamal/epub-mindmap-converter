@@ -1,0 +1,43 @@
+{
+  "name": "EPUB to Mindmap Converter",
+  "description": "A web application that converts EPUB files to interactive mindmaps using AI",
+  "repository": "https://github.com/your-username/your-repo-name",
+  "logo": "https://raw.githubusercontent.com/your-username/your-repo-name/main/logo.png",
+  "keywords": ["epub", "mindmap", "ai", "flask", "converter"],
+  "stack": "heroku-20",
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "env": {
+    "OPENAI_API_KEY": {
+      "description": "Your OpenAI API key for AI model access",
+      "required": true
+    },
+    "SECRET_KEY": {
+      "description": "A secret key for Flask sessions",
+      "generator": "secret"
+    },
+    "FLASK_DEBUG": {
+      "description": "Enable Flask debug mode",
+      "value": "false",
+      "required": false
+    },
+    "MAX_FILE_SIZE_MB": {
+      "description": "Maximum file upload size in MB",
+      "value": "100",
+      "required": false
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "addons": [],
+  "scripts": {
+    "postdeploy": "echo 'Deployment completed successfully!'"
+  }
+}
