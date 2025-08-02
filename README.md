@@ -2,6 +2,16 @@
 
 A beautiful, user-friendly web interface for converting EPUB files into interactive mindmaps.
 
+## 🚀 Live Demo
+
+**Try it now!** The application is live and ready to use:
+
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-Try_Now!-blue?style=for-the-badge&logo=railway)](https://web-production-df20d.up.railway.app/)
+
+👆 **Click the button above to use the live application!**
+
+🔗 **Direct link:** https://web-production-df20d.up.railway.app/
+
 ## Features
 
 - **Drag & Drop Upload**: Easy file upload with visual feedback
@@ -150,6 +160,34 @@ python app.py
 ```
 
 The interface will automatically reload when you make changes to the code.
+
+## 🚀 Deployment
+
+This application is deployed on **Railway** for easy, reliable hosting. 
+
+### Deploy Your Own Instance
+
+You can easily deploy your own instance of this application:
+
+#### Option 1: Railway (Recommended)
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/github_repo/deepakkamal/epub-mindmap-converter)
+
+1. Click the "Deploy on Railway" button above
+2. Connect your GitHub account
+3. Fork this repository 
+4. Set environment variables:
+   - `OPENAI_API_KEY` - Get from [OpenAI Platform](https://platform.openai.com/api-keys)
+   - `SECRET_KEY` - Any random string for Flask sessions
+5. Deploy automatically!
+
+#### Other Platforms
+This app is also configured for:
+- **Heroku** (using `Procfile`)
+- **Vercel** (using `vercel.json`)
+- **Docker** (using `Dockerfile`)
+- **Google Cloud Run**
+
+See `DEPLOYMENT.md` for detailed instructions for each platform.
 
 ## Security Notes
 
