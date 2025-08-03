@@ -234,7 +234,8 @@ def _add_explanation_section_to_pdf(story, explanation_content, styles):
     """Add explanation section to PDF with proper formatting"""
     cleaned_content = _clean_markdown_remnants(explanation_content)
     
-    story.append(Paragraph("Mind Map Explanation", styles['SectionHeading']))
+    # Content already includes proper title (e.g., "Mind Map Explanation: Chapter Title")
+    # No need for redundant generic header
     _add_formatted_content_to_pdf(story, cleaned_content, styles)
 
 

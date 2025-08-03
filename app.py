@@ -1089,7 +1089,7 @@ def get_chapters():
                         'canonical_name': chapter_info.get('canonical_name', filename.replace('.md', '')),
                         'available': True,
                         'full_path': chapter_info.get('full_path', ''),
-                        'preview': f"Chapter: {chapter_info.get('title', filename)}"
+                        'preview': chapter_info.get('title', filename)
                     })
             else:
                 # If it's already an array, use it directly
