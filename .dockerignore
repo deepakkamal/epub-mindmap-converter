@@ -1,0 +1,65 @@
+# Git
+.git/
+.gitignore
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.pytest_cache/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Documentation (no need in container)
+*.md
+docs/
+
+# Test files
+tests/
+test_*.py
+*_test.py
+
+# Development files
+.editorconfig
+.flake8
+.pre-commit-config.yaml
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Node.js (if any)
+node_modules/
+npm-debug.log
+
+# Railway/Deployment
+railway.json
+railway.toml
+vercel.json
