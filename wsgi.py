@@ -175,4 +175,11 @@ sys.path.insert(0, '/app')
 print(f"✅ Final Python path: {sys.path[:3]}... (showing first 3)")
 
 # WSGI application object - this is what Gunicorn will use
+# Export the Flask app for Gunicorn to find
+application = app
+
+# Legacy compatibility - some WSGI servers look for 'application'
+# Gunicorn will use 'wsgi:app' which references the 'app' imported above
+print(f"✅ WSGI app exported successfully: {type(app)}")
+
 # Do not include if __name__ == "__main__" block to prevent Flask dev server
