@@ -33,9 +33,10 @@ USER user
 # Expose port (Railway will override this with $PORT)
 EXPOSE 8080
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:${PORT:-8080}/ || exit 1
+# Health check - disabled for Railway (Railway has its own health monitoring)
+# HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+#     CMD curl -f http://localhost:${PORT:-8080}/ || exit 1
 
 # Run with Gunicorn (production WSGI server)
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "wsgi:app", "--workers", "2", "--timeout", "120", "--access-logfile", "-", "--error-logfile", "-"]
+# Note: Railway prioritizes Procfile over Dockerfile CMD
+CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:${PORT:-8080} wsgi:app --workers 2 --timeout 120 --access-logfile - --error-logfile -"]
