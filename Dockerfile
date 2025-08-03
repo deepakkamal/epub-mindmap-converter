@@ -4,7 +4,7 @@ FROM python:3.10-slim
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV FLASK_APP=wsgi.py
+ENV FLASK_APP=wsgi_minimal.py
 ENV FLASK_ENV=production
 
 # Set working directory
@@ -39,4 +39,4 @@ EXPOSE 8080
 
 # Run with Gunicorn (production WSGI server)
 # Note: Railway prioritizes Procfile over Dockerfile CMD
-CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:${PORT:-8080} wsgi:app --workers 2 --timeout 120 --access-logfile - --error-logfile -"]
+CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:${PORT:-8080} wsgi_minimal:application --workers 1 --timeout 30 --log-level debug --access-logfile - --error-logfile -"]
