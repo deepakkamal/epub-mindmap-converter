@@ -196,7 +196,7 @@ def _add_chapter_content_to_pdf(story, chapter_data, chapter_name, styles):
 
 
 def _add_mindmap_section_to_pdf(story, mindmap_content, styles):
-    """Add mindmap section to PDF with image or text fallback"""
+    """Add mindmap section to PDF with smart aspect ratio preservation"""
     # Content already includes proper mindmap title, no need for generic header
     
     # Try to generate and add mindmap image
@@ -206,12 +206,99 @@ def _add_mindmap_section_to_pdf(story, mindmap_content, styles):
         image_data = _generate_mindmap_image(mindmap_content)
         
         if image_data:
-            # Add image to PDF
+            # Smart image sizing with aspect ratio preservation
             image_stream = io.BytesIO(image_data)
-            img = Image(image_stream, width=6*inch, height=4*inch)
-            story.append(img)
-            story.append(Spacer(1, 0.2*inch))
-            image_added = True
+            
+            # Get page dimensions (assuming A4/Letter standard)
+            page_width = 8.5 * inch  # Standard usable width
+            page_height = 11 * inch  # Standard usable height
+            max_image_width = page_width - (2 * inch)  # Leave margins
+            max_image_height = page_height * 0.6  # Use up to 60% of page height
+            
+            try:
+                # Use PIL to get actual image dimensions
+                from PIL import Image as PILImage
+                pil_image = PILImage.open(image_stream)
+                original_width, original_height = pil_image.size
+                aspect_ratio = original_height / original_width
+                
+                print(f"📐 Original mindmap dimensions: {original_width}×{original_height} (aspect: {aspect_ratio:.2f})")
+                
+                # Determine if mindmap is landscape (wide) or portrait (tall)
+                is_landscape = aspect_ratio < 0.7  # Width significantly > height
+                is_very_tall = aspect_ratio > 1.5   # Height significantly > width
+                
+                if is_landscape:
+                    # Wide mindmap: prioritize width, may need landscape orientation
+                    final_width = min(max_image_width, 7 * inch)
+                    final_height = final_width * aspect_ratio
+                    
+                    # If still too tall, adjust proportionally
+                    if final_height > max_image_height:
+                        final_height = max_image_height
+                        final_width = final_height / aspect_ratio
+                    
+                    print(f"🖼️ Wide mindmap detected - using landscape optimization")
+                    
+                elif is_very_tall:
+                    # Tall mindmap: prioritize height 
+                    final_height = min(max_image_height, 8 * inch)
+                    final_width = final_height / aspect_ratio
+                    
+                    # If too wide, adjust proportionally
+                    if final_width > max_image_width:
+                        final_width = max_image_width
+                        final_height = final_width * aspect_ratio
+                    
+                    print(f"🖼️ Tall mindmap detected - using portrait optimization")
+                    
+                else:
+                    # Balanced mindmap: optimize for best fit
+                    # Try width-first approach
+                    final_width = min(max_image_width, 6 * inch)
+                    final_height = final_width * aspect_ratio
+                    
+                    # If too tall, try height-first approach
+                    if final_height > max_image_height:
+                        final_height = max_image_height
+                        final_width = final_height / aspect_ratio
+                    
+                    print(f"🖼️ Balanced mindmap detected - using optimal fit")
+                
+                # Reset stream position
+                image_stream.seek(0)
+                
+                # Create ReportLab image with calculated dimensions and aspect ratio preservation
+                img = Image(image_stream, width=final_width, height=final_height, kind='proportional')
+                
+                print(f"✓ Mindmap image sized: {final_width/inch:.1f}\"×{final_height/inch:.1f}\" (preserved aspect ratio)")
+                
+                # Center the image if it's smaller than max width
+                if final_width < max_image_width:
+                    # Add some centering space
+                    left_margin = (max_image_width - final_width) / 2
+                    story.append(Spacer(1, 0.1*inch))
+                
+                story.append(img)
+                story.append(Spacer(1, 0.2*inch))
+                image_added = True
+                
+            except ImportError:
+                # Fallback if PIL is not available - use conservative sizing
+                print("⚠️ PIL not available, using conservative sizing")
+                img = Image(image_stream, width=5*inch, height=4*inch, kind='proportional')
+                story.append(img)
+                story.append(Spacer(1, 0.2*inch))
+                image_added = True
+                
+            except Exception as sizing_error:
+                print(f"⚠️ Error in smart sizing, using fallback: {sizing_error}")
+                # Reset stream and use basic proportional sizing
+                image_stream.seek(0)
+                img = Image(image_stream, width=5*inch, height=4*inch, kind='proportional')
+                story.append(img)
+                story.append(Spacer(1, 0.2*inch))
+                image_added = True
             
     except Exception as e:
         print(f"✗ Error adding mindmap image to PDF: {e}")
