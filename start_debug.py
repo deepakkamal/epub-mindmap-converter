@@ -14,6 +14,25 @@ print(f"🐍 Python: {sys.executable}")
 print(f"📁 Working dir: {os.getcwd()}")
 print(f"🌐 PORT: {os.environ.get('PORT', 'NOT SET')}")
 
+# Fix Python path issues first
+print(f"🔧 Fixing Python path issues...")
+original_path = sys.path.copy()
+print(f"   Original: {original_path}")
+
+# Remove duplicates and problematic paths
+cleaned_paths = []
+seen = set()
+for path in sys.path:
+    if path not in seen and 'web_interface' not in path:
+        cleaned_paths.append(path)
+        seen.add(path)
+
+sys.path[:] = cleaned_paths
+if '/app' in sys.path:
+    sys.path.remove('/app')
+sys.path.insert(0, '/app')
+print(f"✅ Fixed Python path: {sys.path[:3]}...")
+
 # Test WSGI import one more time
 print("🧪 Testing WSGI import in startup wrapper...")
 try:

@@ -150,13 +150,29 @@ try:
 except Exception as route_error:
     print(f"❌ Route debugging failed: {route_error}")
 
-# Check Python path issues
+# Check and fix Python path issues
 print(f"🐍 Python path analysis:")
-unique_paths = list(dict.fromkeys(sys.path))  # Remove duplicates
-print(f"   Total paths: {len(sys.path)}, Unique: {len(unique_paths)}")
-problematic_paths = [p for p in sys.path if 'web_interface' in p or p.count('/app') > 0]
-if problematic_paths:
-    print(f"⚠️  Potentially problematic paths: {problematic_paths}")
+original_path = sys.path.copy()
+print(f"   Original paths: {original_path}")
+
+# Remove duplicates and problematic paths
+cleaned_paths = []
+seen = set()
+for path in sys.path:
+    if path not in seen and 'web_interface' not in path:
+        cleaned_paths.append(path)
+        seen.add(path)
+
+# Update sys.path
+sys.path[:] = cleaned_paths
+print(f"🔧 Cleaned Python path: {sys.path}")
+print(f"📊 Removed {len(original_path) - len(sys.path)} problematic paths")
+
+# Ensure /app is first (current working directory)
+if '/app' in sys.path:
+    sys.path.remove('/app')
+sys.path.insert(0, '/app')
+print(f"✅ Final Python path: {sys.path[:3]}... (showing first 3)")
 
 # WSGI application object - this is what Gunicorn will use
 # Do not include if __name__ == "__main__" block to prevent Flask dev server
