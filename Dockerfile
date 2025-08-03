@@ -31,4 +31,5 @@ EXPOSE 8080
 #     CMD curl -f http://localhost:8080/ || exit 1
 
 # Run with Gunicorn (production WSGI server)
+# Railway uses Procfile instead of this CMD, but keeping for other platforms
 CMD ["gunicorn", "--bind", "0.0.0.0:8080", "wsgi:app", "--workers", "2", "--timeout", "120"]
