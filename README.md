@@ -1,26 +1,126 @@
-# EPUB to Mindmap Web Interface
+# 📚 EPUB to Mindmap Converter
 
-A beautiful, user-friendly web interface for converting EPUB files into interactive mindmaps.
-
-## 🚀 Live Demo
-
-**Try it now!** The application is live and ready to use:
+> Transform your EPUB books into interactive, AI-powered mindmaps with ease
 
 [![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-Try_Now!-blue?style=for-the-badge&logo=railway)](https://web-production-df20d.up.railway.app/)
+[![GitHub Stars](https://img.shields.io/github/stars/deepakkamal/epub-mindmap-converter?style=social)](https://github.com/deepakkamal/epub-mindmap-converter)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
+[![Flask](https://img.shields.io/badge/Flask-2.0+-green.svg)](https://flask.palletsprojects.com/)
 
-👆 **Click the button above to use the live application!**
+## 📋 Table of Contents
 
-🔗 **Direct link:** https://web-production-df20d.up.railway.app/
+- [About](#-about)
+- [Project Origin & Motivation](#-project-origin--motivation)
+- [Quick Start](#-quick-start)
+  - [🔑 Getting Your OpenAI API Key](#-getting-your-openai-api-key)
+  - [🚀 Using the Live Demo](#-using-the-live-demo)
+  - [💻 Local Development](#-local-development)
+- [EPUB Processing Pipeline](#-epub-processing-pipeline)
+- [Project Architecture](#-project-architecture)
+- [Contributing](#-contributing)
+- [Self-hosting](#-self-hosting)
+- [Resources](#-resources)
+- [License](#-license)
+- [Documentation](#-documentation)
 
-## Features
+## 🎯 About
 
-- **Drag & Drop Upload**: Easy file upload with visual feedback
-- **Real-time Processing**: Live progress tracking with animations
-- **Chapter Selection**: Choose which chapters to process with checkboxes
-- **Batch Processing**: Generate mindmaps for multiple chapters simultaneously
-- **Download Management**: Get combined results or individual chapter analyses
-- **Responsive Design**: Works on desktop and mobile devices
-- **Error Handling**: Graceful error handling with clear messages
+**EPUB to Mindmap Converter** is a powerful, AI-driven web application that transforms EPUB books into interactive mindmaps. Built with Flask and powered by OpenAI's GPT models, it provides an intuitive interface for extracting, processing, and visualizing book content in a structured, mind-map format.
+
+### ✨ Key Features
+
+- **🎯 Drag & Drop Interface**: Intuitive file upload with visual feedback
+- **🤖 AI-Powered Processing**: Uses OpenAI GPT models for intelligent content analysis  
+- **📖 Chapter Selection**: Choose specific chapters to process
+- **⚡ Real-time Progress**: Live progress tracking with animations
+- **📊 Multiple Export Formats**: Download as Markdown, DOCX, or PDF
+- **🎨 Interactive UI**: Modern, responsive design that works on all devices
+- **🔒 Secure Processing**: Files processed in isolated sessions with automatic cleanup
+- **⚙️ Flexible Configuration**: Customizable AI models and processing options
+
+## 🌟 Project Origin & Motivation
+
+This project was born from the need to quickly understand and visualize complex information in books. Traditional reading can be time-consuming when you need to extract key concepts and relationships. By leveraging AI to create structured mindmaps, this tool helps:
+
+- **Students** quickly grasp book concepts and create study materials
+- **Researchers** extract key information and relationships from literature  
+- **Professionals** create summaries and presentations from technical books
+- **Educators** develop teaching materials and course outlines
+
+The goal is to make knowledge more accessible and actionable through visual representation.
+
+## 🚀 Quick Start
+
+### 🔑 Getting Your OpenAI API Key
+
+To use this application, you'll need an OpenAI API key. Here's how to get one:
+
+1. **Create an OpenAI Account**
+   - Visit [platform.openai.com](https://platform.openai.com) (not chatgpt.com)
+   - Click "Sign Up" or log in if you already have an account
+   - Verify your email address
+
+2. **Access the API Dashboard**
+   - Once logged in, navigate to the API section
+   - Click on your profile icon in the top right
+   - Select "View API keys" from the dropdown
+
+3. **Create Your API Key**
+   - Click "Create new secret key"
+   - Give your key a descriptive name (e.g., "EPUB Mindmap Converter")
+   - Select appropriate permissions (Full access recommended)
+   - Click "Create secret key"
+
+4. **Secure Your Key**
+   - **Copy the key immediately** - you won't be able to see it again
+   - Store it securely (consider using a password manager)
+   - Never share it publicly or commit it to version control
+
+5. **Add Billing Information**
+   - Go to the Billing section in your OpenAI dashboard
+   - Add a payment method
+   - Add at least $5 credit to your account (minimum required)
+
+6. **Monitor Usage**
+   - Track your API usage in the OpenAI dashboard
+   - Set usage limits to avoid unexpected charges
+   - The app uses cost-effective models (GPT-4o-mini by default)
+
+> **💡 Tip**: Start with GPT-4o-mini model for cost-effective processing. You can upgrade to GPT-4 for higher quality results if needed.
+
+### 🚀 Using the Live Demo
+
+1. **Visit the Application**: [https://web-production-df20d.up.railway.app/](https://web-production-df20d.up.railway.app/)
+2. **Enter Your API Key**: Paste your OpenAI API key in the configuration section
+3. **Upload an EPUB**: Drag and drop or select your EPUB file (up to 50MB)
+4. **Select Chapters**: Choose which chapters you want to convert to mindmaps
+5. **Generate Mindmaps**: Click "Generate Mindmaps" and wait for processing
+6. **Download Results**: Get your mindmaps in Markdown, DOCX, or PDF format
+
+### 💻 Local Development
+
+```bash
+# Clone the repository
+git clone https://github.com/deepakkamal/epub-mindmap-converter.git
+cd epub-mindmap-converter
+
+# Create virtual environment (recommended)
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env and add your OpenAI API key
+
+# Run the application
+python app.py
+
+# Open your browser to http://localhost:5000
+```
 
 ## Installation
 
