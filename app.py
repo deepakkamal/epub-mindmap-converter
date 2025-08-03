@@ -265,12 +265,40 @@ except ImportError as e:
             'total_models': 2
         }
 
-app = Flask(__name__)
+# FLASK APP CREATION DEBUG
+print("🚀 FLASK DEBUG: About to create Flask app...")
+print(f"📁 Current working directory: {os.getcwd()}")
+print(f"🐍 Python executable: {sys.executable}")
+print(f"📦 Python path: {sys.path[:3]}...")
+
+try:
+    app = Flask(__name__)
+    print("✅ Flask app created successfully!")
+    print(f"📱 App object: {app}")
+    print(f"🛠️ App name: {app.name}")
+except Exception as e:
+    print(f"❌ CRITICAL: Flask app creation failed!")
+    print(f"❌ Error: {e}")
+    import traceback
+    traceback.print_exc()
+    raise
+
 # Use environment variable for secret key in production
-app.secret_key = os.environ.get('SECRET_KEY', 'epub_mindmap_converter_secret_key_2025')
+try:
+    app.secret_key = os.environ.get('SECRET_KEY', 'epub_mindmap_converter_secret_key_2025')
+    print(f"🔐 Secret key set: {'✅ from env' if 'SECRET_KEY' in os.environ else '⚠️  using default'}")
+except Exception as e:
+    print(f"❌ Secret key setup failed: {e}")
+    
 # Configure max file size (can be overridden by environment)
-max_file_size = int(os.environ.get('MAX_FILE_SIZE_MB', 100)) * 1024 * 1024
-app.config['MAX_CONTENT_LENGTH'] = max_file_size
+try:
+    max_file_size = int(os.environ.get('MAX_FILE_SIZE_MB', 100)) * 1024 * 1024
+    app.config['MAX_CONTENT_LENGTH'] = max_file_size
+    print(f"📁 Max file size: {max_file_size // (1024*1024)}MB")
+except Exception as e:
+    print(f"❌ File size config failed: {e}")
+
+print("🎯 Flask app configuration complete")
 
 # Memory-only processing - no persistent directories or file storage needed
 # All file processing happens in RAM without touching the filesystem
@@ -278,6 +306,25 @@ app.config['MAX_CONTENT_LENGTH'] = max_file_size
 # Global storage for processing status
 processing_status = {}
 chapter_data = {}
+
+# DEBUGGING ROUTES - Add these first to test basic functionality
+@app.route('/debug/health')
+def debug_health():
+    """Simple health check for debugging Railway 502 issues"""
+    return {
+        'status': 'OK',
+        'timestamp': datetime.now().isoformat(),
+        'message': 'Flask app is running!',
+        'port': os.environ.get('PORT', 'NOT SET'),
+        'railway_env': [k for k in os.environ.keys() if 'RAILWAY' in k]
+    }
+
+@app.route('/debug/test')
+def debug_test():
+    """Minimal test endpoint"""
+    return "TEST OK", 200
+
+print("🧪 Debug routes added: /debug/health and /debug/test")
 
 
 # Security headers for production
