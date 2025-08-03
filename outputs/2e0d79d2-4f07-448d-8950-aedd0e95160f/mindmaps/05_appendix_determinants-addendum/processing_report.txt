@@ -1,0 +1,22 @@
+
+Processing Report
+================
+
+Document: 05_appendix_determinants-addendum
+Timestamp: 2025-07-27T17:46:37.038812
+Model: gpt-4o-mini
+
+Chunking Results:
+- Total chunks created: 1
+- Total tokens: 11031
+
+Analysis Results:
+- Successful chunks: 1
+- Failed chunks: 0
+
+Synthesis:
+- Categories processed: 5
+- Synthesis model: gpt-4o-mini
+
+Validation:
+[OK] All validation checks passed

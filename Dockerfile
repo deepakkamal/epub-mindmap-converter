@@ -18,20 +18,17 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
-# Create necessary directories
-RUN mkdir -p uploads outputs static/temp
-
-# Set environment variables
+# Set environment variables  
 ENV FLASK_APP=wsgi.py
 ENV FLASK_ENV=production
 ENV PYTHONPATH=/app
 
-# Expose port
-EXPOSE 5000
+# Expose port (Railway will override this with $PORT)
+EXPOSE 8080
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:5000/ || exit 1
+# Health check (disabled - Railway has its own health checks)
+# HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+#     CMD curl -f http://localhost:8080/ || exit 1
 
-# Run the application
-CMD ["python", "wsgi.py"]
+# Run with Gunicorn (production WSGI server)
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "wsgi:app", "--workers", "2", "--timeout", "120"]

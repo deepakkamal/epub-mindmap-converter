@@ -42,9 +42,7 @@ web_interface/                    # 🎯 MAIN APPLICATION FOLDER
 │   ├── mindmap_generator.py
 │   └── [other core files]
 ├── 📁 templates/                # HTML templates
-├── 📁 static/                   # CSS, JS, images
-├── 📁 uploads/                  # User file uploads
-├── 📁 outputs/                  # Generated outputs
+├── 📁 static/                   # Static web assets
 ├── 📄 app.py                    # Main Flask application
 ├── 📄 canonical_chapters.py     # Chapter management
 ├── 📄 docx_converter_new.py     # DOCX generation

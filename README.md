@@ -194,9 +194,8 @@ web_interface/
 ├── app.py                 # Main Flask application
 ├── templates/
 │   └── index.html        # Main web interface
-├── static/               # Static assets (auto-generated)
-├── uploads/              # Temporary file uploads
-├── outputs/              # Processing results
+├── static/               # Static web assets  
+├── templates/            # HTML templates
 └── requirements.txt      # Python dependencies
 ```
 
@@ -215,7 +214,7 @@ web_interface/
 1. **EPUB Upload** → Extract chapters using `epub_to_markdown.py`
 2. **Chapter Selection** → User selects desired chapters
 3. **Mindmap Generation** → Process chapters using `main.py`
-4. **Result Compilation** → Combine outputs into downloadable files
+4. **Result Compilation** → Generate downloadable files in memory
 5. **Download** → Provide access to generated content
 
 ## Error Handling
@@ -293,5 +292,5 @@ See `DEPLOYMENT.md` for detailed instructions for each platform.
 
 - Files are processed in isolated session directories
 - Temporary files are automatically cleaned up
-- File upload validation prevents malicious uploads
+- Memory-only processing ensures no persistent file storage
 - No sensitive data is stored permanently

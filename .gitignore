@@ -34,10 +34,10 @@ ENV/
 env.bak/
 venv.bak/
 
-# User uploads and outputs
-uploads/
-outputs/
-static/temp/
+# Legacy directories (no longer used - memory-only processing)
+# uploads/
+# outputs/
+# static/temp/
 
 # IDE files
 .vscode/

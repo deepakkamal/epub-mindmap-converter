@@ -19,9 +19,9 @@ The application uses the following environment variables:
 - `FLASK_DEBUG`: Set to `false` for production (default: `false`)
 - `FLASK_HOST`: Host to bind to (default: `0.0.0.0`)
 - `MAX_FILE_SIZE_MB`: Maximum upload file size in MB (default: `100`)
-- `UPLOAD_FOLDER`: Directory for uploads (default: `uploads`)
-- `OUTPUT_FOLDER`: Directory for outputs (default: `outputs`)
 - `PORT`: Port to run on (auto-set by most platforms)
+
+**Note**: This app uses memory-only processing - no persistent file storage directories are needed.
 
 ## Deployment Platforms
 

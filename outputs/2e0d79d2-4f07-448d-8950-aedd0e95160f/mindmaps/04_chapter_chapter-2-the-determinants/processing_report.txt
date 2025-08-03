@@ -1,0 +1,22 @@
+
+Processing Report
+================
+
+Document: 04_chapter_chapter-2-the-determinants
+Timestamp: 2025-07-27T17:45:50.826862
+Model: gpt-4o-mini
+
+Chunking Results:
+- Total chunks created: 2
+- Total tokens: 20530
+
+Analysis Results:
+- Successful chunks: 2
+- Failed chunks: 0
+
+Synthesis:
+- Categories processed: 5
+- Synthesis model: gpt-4o-mini
+
+Validation:
+[OK] All validation checks passed

@@ -271,13 +271,9 @@ app.secret_key = os.environ.get('SECRET_KEY', 'epub_mindmap_converter_secret_key
 # Configure max file size (can be overridden by environment)
 max_file_size = int(os.environ.get('MAX_FILE_SIZE_MB', 100)) * 1024 * 1024
 app.config['MAX_CONTENT_LENGTH'] = max_file_size
-app.config['UPLOAD_FOLDER'] = os.environ.get('UPLOAD_FOLDER', 'uploads')
-app.config['OUTPUT_FOLDER'] = os.environ.get('OUTPUT_FOLDER', 'outputs')
 
-# Create necessary directories
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-os.makedirs(app.config['OUTPUT_FOLDER'], exist_ok=True)
-# Static temp directory removed - using memory-only operations
+# Memory-only processing - no persistent directories or file storage needed
+# All file processing happens in RAM without touching the filesystem
 
 # Global storage for processing status
 processing_status = {}

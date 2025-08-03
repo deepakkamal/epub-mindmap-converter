@@ -1,8 +1,8 @@
 {
   "name": "EPUB to Mindmap Converter",
   "description": "A web application that converts EPUB files to interactive mindmaps using AI",
-  "repository": "https://github.com/your-username/your-repo-name",
-  "logo": "https://raw.githubusercontent.com/your-username/your-repo-name/main/logo.png",
+  "repository": "https://github.com/deepakkamal/epub-mindmap-converter",
+  "logo": "https://img.shields.io/badge/📚-EPUB%20to%20Mindmap-blue?style=for-the-badge",
   "keywords": ["epub", "mindmap", "ai", "flask", "converter"],
   "stack": "heroku-20",
   "buildpacks": [
