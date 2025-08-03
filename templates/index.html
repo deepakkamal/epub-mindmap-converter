@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -884,6 +884,9 @@
             border: 1px solid rgba(79, 70, 229, 0.2);
         }
     </style>
+    
+    <!-- Dark Mode CSS - Must be loaded after other styles to properly override -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}">
 </head>
 <body>
     <div class="container">
@@ -2014,5 +2017,8 @@
             checkStatus();
         }
     </script>
+    
+    <!-- Dark Mode JavaScript - Initialize theme system -->
+    <script src="{{ url_for('static', filename='js/dark-mode.js') }}"></script>
 </body>
 </html>
