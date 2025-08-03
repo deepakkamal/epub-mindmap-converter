@@ -58,40 +58,29 @@ try:
     # Import PDF creator
     from simple_pdf_creator import create_pdf
     
-    # Import DOCX converter - try new streamlined version first
+    # Import DOCX converter 
     try:
-        from docx_converter_new import convert_chapter_to_docx
+        from simple_docx_creator import create_chapter_docx_direct, create_combined_docx_direct
         DOCX_CONVERTER_AVAILABLE = True
-        print("✓ New streamlined DOCX converter loaded")
+        print("✓ DOCX converter loaded successfully")
         
-        # Create legacy compatibility function
-        def convert_analysis_to_docx(markdown_file_path, output_dir, filename_prefix):
-            """Legacy compatibility wrapper"""
-            chapter_name = filename_prefix or os.path.basename(os.path.dirname(markdown_file_path))
-            chapter_dir = os.path.dirname(markdown_file_path)
-            return convert_chapter_to_docx(chapter_name, chapter_dir, output_dir)
-        
-    except ImportError as new_docx_error:
-        print(f"New DOCX converter not available: {new_docx_error}")
-        try:
-            from simple_docx_creator import create_chapter_docx_direct, create_combined_docx_direct
-            DOCX_CONVERTER_AVAILABLE = True
-            print("✓ Legacy DOCX converter loaded as fallback")
+        # Create wrapper functions for compatibility
+        def convert_chapter_to_docx(chapter_name, chapter_dir, output_dir):
+            """Memory-only DOCX creation - no file operations"""
+            return None  # Memory-only processing
             
-            # Create wrapper for new interface
-            def convert_chapter_to_docx(chapter_name, chapter_dir, output_dir):
-                # Create temp markdown file for legacy converter
-                # Legacy converter disabled - use memory-only operations
-                return None
+        def convert_analysis_to_docx(markdown_file_path, output_dir, filename_prefix):
+            """Memory-only DOCX creation - no file operations"""
+            return None  # Memory-only processing
                 
-        except ImportError as docx_error:
-            print(f"Warning: DOCX converter not available: {docx_error}")
-            DOCX_CONVERTER_AVAILABLE = False
-            # Create dummy functions so the app doesn't crash
-            def convert_chapter_to_docx(*args, **kwargs):
-                raise Exception("DOCX converter not available")
-            def convert_analysis_to_docx(*args, **kwargs):
-                raise Exception("DOCX converter not available")
+    except ImportError as docx_error:
+        print(f"Warning: DOCX converter not available: {docx_error}")
+        DOCX_CONVERTER_AVAILABLE = False
+        # Create dummy functions so the app doesn't crash
+        def convert_chapter_to_docx(*args, **kwargs):
+            raise Exception("DOCX converter not available")
+        def convert_analysis_to_docx(*args, **kwargs):
+            raise Exception("DOCX converter not available")
     
     MINDMAP_CREATOR_AVAILABLE = True
     print("✓ Mind map creator loaded successfully")

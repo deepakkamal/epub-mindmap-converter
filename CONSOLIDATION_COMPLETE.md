@@ -45,7 +45,7 @@ web_interface/                    # 🎯 MAIN APPLICATION FOLDER
 ├── 📁 static/                   # Static web assets
 ├── 📄 app.py                    # Main Flask application
 ├── 📄 canonical_chapters.py     # Chapter management
-├── 📄 docx_converter_new.py     # DOCX generation
+├── 📄 simple_docx_creator.py     # DOCX generation
 ├── 📄 pricing_manager.py        # AI model pricing
 ├── 📄 shared_config.py          # Configuration
 ├── 📄 wsgi.py                   # WSGI entry point
