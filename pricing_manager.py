@@ -297,13 +297,15 @@ class OpenAIPricingManager:
         """
         print(f"Fetching pricing data (force_refresh={force_refresh})...")
         
-        # Get API key from environment if not provided
+        # Get API key from environment if not provided by user
         if not api_key:
             api_key = os.environ.get('OPENAI_API_KEY')
             if api_key:
                 print("✓ Using API key from environment")
             else:
-                print("ℹ No API key found in environment")
+                print("ℹ No API key available - using curated model list")
+        else:
+            print("✓ Using user-provided API key for live pricing data")
         
         # Check cache first (unless force refresh)
         if not force_refresh:

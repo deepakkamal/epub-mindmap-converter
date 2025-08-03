@@ -255,40 +255,15 @@ except ImportError as e:
             'total_models': 2
         }
 
-# FLASK APP CREATION DEBUG
-print("🚀 FLASK DEBUG: About to create Flask app...")
-print(f"📁 Current working directory: {os.getcwd()}")
-print(f"🐍 Python executable: {sys.executable}")
-print(f"📦 Python path: {sys.path[:3]}...")
-
-try:
-    app = Flask(__name__)
-    print("✅ Flask app created successfully!")
-    print(f"📱 App object: {app}")
-    print(f"🛠️ App name: {app.name}")
-except Exception as e:
-    print(f"❌ CRITICAL: Flask app creation failed!")
-    print(f"❌ Error: {e}")
-    import traceback
-    traceback.print_exc()
-    raise
+# Create Flask application
+app = Flask(__name__)
 
 # Use environment variable for secret key in production
-try:
-    app.secret_key = os.environ.get('SECRET_KEY', 'epub_mindmap_converter_secret_key_2025')
-    print(f"🔐 Secret key set: {'✅ from env' if 'SECRET_KEY' in os.environ else '⚠️  using default'}")
-except Exception as e:
-    print(f"❌ Secret key setup failed: {e}")
-    
-# Configure max file size (can be overridden by environment)
-try:
-    max_file_size = int(os.environ.get('MAX_FILE_SIZE_MB', 100)) * 1024 * 1024
-    app.config['MAX_CONTENT_LENGTH'] = max_file_size
-    print(f"📁 Max file size: {max_file_size // (1024*1024)}MB")
-except Exception as e:
-    print(f"❌ File size config failed: {e}")
+app.secret_key = os.environ.get('SECRET_KEY', 'epub_mindmap_converter_secret_key_2025')
 
-print("🎯 Flask app configuration complete")
+# Configure max file size (can be overridden by environment)
+max_file_size = int(os.environ.get('MAX_FILE_SIZE_MB', 100)) * 1024 * 1024
+app.config['MAX_CONTENT_LENGTH'] = max_file_size
 
 # Memory-only processing - no persistent directories or file storage needed
 # All file processing happens in RAM without touching the filesystem
@@ -296,26 +271,6 @@ print("🎯 Flask app configuration complete")
 # Global storage for processing status
 processing_status = {}
 chapter_data = {}
-
-# DEBUGGING ROUTES - Add these first to test basic functionality
-@app.route('/debug/health')
-def debug_health():
-    """Simple health check for debugging Railway 502 issues"""
-    return {
-        'status': 'OK',
-        'timestamp': datetime.now().isoformat(),
-        'message': 'Flask app is running!',
-        'port': os.environ.get('PORT', 'NOT SET'),
-        'railway_env': [k for k in os.environ.keys() if 'RAILWAY' in k]
-    }
-
-@app.route('/debug/test')
-def debug_test():
-    """Minimal test endpoint"""
-    return "TEST OK", 200
-
-print("🧪 Debug routes added: /debug/health and /debug/test")
-
 
 # Security headers for production
 @app.after_request
@@ -1019,12 +974,24 @@ def validate_api_key():
         return jsonify({'valid': False, 'error': str(e)})
 
 
-@app.route('/get_affordable_models', methods=['GET'])
+@app.route('/get_affordable_models', methods=['GET', 'POST'])
 def get_affordable_models():
-    """Get list of affordable OpenAI models."""
+    """Get list of affordable OpenAI models using user's API key."""
     try:
-        # Get pricing summary from pricing manager
-        pricing_summary = get_pricing_summary()
+        # Get API key from request body or query params
+        api_key = None
+        force_refresh = False
+        
+        if request.method == 'POST' and request.get_json():
+            data = request.get_json()
+            api_key = data.get('api_key', '').strip()
+            force_refresh = data.get('force_refresh', False)
+        elif request.method == 'GET':
+            api_key = request.args.get('api_key', '').strip()
+            force_refresh = request.args.get('force_refresh', 'false').lower() == 'true'
+        
+        # Use user's API key to get fresh pricing data
+        pricing_summary = get_pricing_summary(api_key=api_key, force_refresh=force_refresh)
         
         # Convert to the format expected by the frontend
         models = []
@@ -1040,7 +1007,8 @@ def get_affordable_models():
         return jsonify({
             'models': models,
             'total_count': len(models),
-            'last_updated': pricing_summary['last_updated']
+            'last_updated': pricing_summary['last_updated'],
+            'using_api_key': bool(api_key)
         })
         
     except Exception as e:

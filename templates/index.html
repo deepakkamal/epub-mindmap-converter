@@ -1269,10 +1269,30 @@
             keyStatus.innerHTML = `<div class="alert alert-${type === 'error' ? 'danger' : 'success'} small">${message}</div>`;
         }
 
-        async function loadAffordableModels() {
+        async function loadAffordableModels(forceRefresh = false) {
             try {
                 console.log('Loading affordable models...');
-                const response = await fetch('/get_affordable_models');
+                
+                let response;
+                if (apiKey) {
+                    // Send API key to get fresh pricing data
+                    console.log('Using user API key to fetch live pricing data');
+                    response = await fetch('/get_affordable_models', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ 
+                            api_key: apiKey,
+                            force_refresh: forceRefresh
+                        })
+                    });
+                } else {
+                    // Fallback to cached data
+                    console.log('No API key available, using cached pricing data');
+                    response = await fetch('/get_affordable_models');
+                }
+                
                 const data = await response.json();
                 console.log('Models data received:', data);
                 
