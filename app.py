@@ -1600,14 +1600,12 @@ def download_chapter_pdf(chapter_name):
 
 
 if __name__ == '__main__':
-    # Only run development server if not in production environment
-    if os.environ.get('RAILWAY_ENVIRONMENT') or os.environ.get('HEROKU_APP_NAME'):
-        print("⚠️  Production environment detected. Use 'gunicorn wsgi:app' instead of running this file directly.")
-        print("   This script should only be used for local development.")
-        exit(1)
+    # Note: In production (Railway/Heroku), this block won't execute
+    # Production deployments use WSGI servers like Gunicorn via wsgi.py
     
     print("🚀 Starting Flask development server...")
     print("   Note: This is for local development only!")
+    print("   Production uses: gunicorn wsgi:app")
     
     # Get port from environment variable (for local development)
     port = int(os.environ.get('PORT', 5001))  # Changed default port to 5001

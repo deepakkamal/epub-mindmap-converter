@@ -1,0 +1,11 @@
+# Railway Nixpacks configuration for Python Flask app
+# This tells Railway exactly how to build and start our app
+
+[phases.setup]
+nixPkgs = ["python3", "python3Packages.pip"]
+
+[phases.install]
+cmds = ["pip install -r requirements.txt"]
+
+[start]
+cmd = "gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120 --preload --log-level info"
