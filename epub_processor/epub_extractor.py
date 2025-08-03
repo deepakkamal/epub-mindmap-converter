@@ -746,10 +746,14 @@ class EpubChapterExtractor:
         safe_title = re.sub(r'[^\w\s-]', '', title).strip().lower()
         safe_title = re.sub(r'[-\s]+', '-', safe_title)
         
+        # Remove redundant chapter prefix if title already contains it
+        if chapter_type == "chapter" and safe_title.startswith('chapter-'):
+            safe_title = safe_title[8:]  # Remove "chapter-" prefix
+        
         # Add padding to index for correct sorting
         padded_index = str(index + 4).zfill(2)  # Start from 04 to match existing naming
         
-        # Create canonical name with index, type and title
+        # Create canonical name with index, type and title (avoiding duplication)
         return f"{padded_index}_{chapter_type}_{safe_title[:50]}"
 
     def _create_safe_filename(self, title: str, index: int, chapter_type: str) -> str:
@@ -758,8 +762,12 @@ class EpubChapterExtractor:
         safe_title = re.sub(r'[^\w\s-]', '', title).strip().lower()
         safe_title = re.sub(r'[-\s]+', '-', safe_title)
         
+        # Remove redundant chapter prefix if title already contains it
+        if chapter_type == "chapter" and safe_title.startswith('chapter-'):
+            safe_title = safe_title[8:]  # Remove "chapter-" prefix
+        
         # Add padding to index for correct sorting
         padded_index = str(index + 1).zfill(2)
         
-        # Create filename with index, type and title
+        # Create filename with index, type and title (avoiding duplication)
         return f"{padded_index}_{chapter_type}_{safe_title[:50]}.md"

@@ -197,8 +197,7 @@ def _add_chapter_content_to_pdf(story, chapter_data, chapter_name, styles):
 
 def _add_mindmap_section_to_pdf(story, mindmap_content, styles):
     """Add mindmap section to PDF with image or text fallback"""
-    # Section heading
-    story.append(Paragraph("Mind Map", styles['SectionHeading']))
+    # Content already includes proper mindmap title, no need for generic header
     
     # Try to generate and add mindmap image
     image_added = False
@@ -243,14 +242,17 @@ def _add_summary_section_to_pdf(story, summary_content, styles):
     """Add summary section to PDF with proper formatting"""
     cleaned_content = _clean_markdown_remnants(summary_content)
     
-    story.append(Paragraph("Comprehensive Summary", styles['SectionHeading']))
+    # Content already includes proper title (e.g., "Comprehensive Summary: Chapter Title")
+    # No need for redundant generic header
     _add_formatted_content_to_pdf(story, cleaned_content, styles)
 
 
 def _add_analysis_section_to_pdf(story, analysis_content, styles):
     """Add detailed analysis section to PDF with proper formatting"""
-    story.append(Paragraph("Detailed Analysis", styles['SectionHeading']))
-    _add_formatted_content_to_pdf(story, analysis_content, styles)
+    cleaned_content = _clean_markdown_remnants(analysis_content)
+    
+    # Content already includes proper title, no need for redundant generic header
+    _add_formatted_content_to_pdf(story, cleaned_content, styles)
 
 
 def _add_formatted_content_to_pdf(story, content, styles):
