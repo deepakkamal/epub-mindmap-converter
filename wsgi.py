@@ -118,5 +118,45 @@ except Exception as wsgi_test_error:
 
 print("🚀 Final WSGI setup complete!")
 
+# Add Gunicorn startup debugging
+print("🔥 About to pass control to Gunicorn...")
+print(f"📊 Memory usage check...")
+try:
+    import psutil
+    process = psutil.Process()
+    memory_info = process.memory_info()
+    print(f"📊 RSS Memory: {memory_info.rss / 1024 / 1024:.1f} MB")
+    print(f"📊 VMS Memory: {memory_info.vms / 1024 / 1024:.1f} MB")
+except ImportError:
+    print("📊 psutil not available for memory check")
+except Exception as mem_error:
+    print(f"📊 Memory check failed: {mem_error}")
+
+print("🎯 WSGI module ready - Gunicorn should start now...")
+
+# Check Flask app routes and configuration
+try:
+    print("🔍 Flask app route debugging...")
+    routes = []
+    for rule in app.url_map.iter_rules():
+        routes.append(f"{rule.rule} ({', '.join(rule.methods)})")
+    print(f"📋 Total routes found: {len(routes)}")
+    print(f"📋 First 5 routes: {routes[:5]}")
+    
+    # Check if debug routes are registered
+    debug_routes = [r for r in routes if 'debug' in r]
+    print(f"🧪 Debug routes: {debug_routes}")
+    
+except Exception as route_error:
+    print(f"❌ Route debugging failed: {route_error}")
+
+# Check Python path issues
+print(f"🐍 Python path analysis:")
+unique_paths = list(dict.fromkeys(sys.path))  # Remove duplicates
+print(f"   Total paths: {len(sys.path)}, Unique: {len(unique_paths)}")
+problematic_paths = [p for p in sys.path if 'web_interface' in p or p.count('/app') > 0]
+if problematic_paths:
+    print(f"⚠️  Potentially problematic paths: {problematic_paths}")
+
 # WSGI application object - this is what Gunicorn will use
 # Do not include if __name__ == "__main__" block to prevent Flask dev server
