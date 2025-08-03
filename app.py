@@ -1604,7 +1604,16 @@ def download_chapter_pdf(chapter_name):
 
 
 if __name__ == '__main__':
-    # Get port from environment variable (for deployment platforms like Heroku, Railway, etc.)
+    # Only run development server if not in production environment
+    if os.environ.get('RAILWAY_ENVIRONMENT') or os.environ.get('HEROKU_APP_NAME'):
+        print("⚠️  Production environment detected. Use 'gunicorn wsgi:app' instead of running this file directly.")
+        print("   This script should only be used for local development.")
+        exit(1)
+    
+    print("🚀 Starting Flask development server...")
+    print("   Note: This is for local development only!")
+    
+    # Get port from environment variable (for local development)
     port = int(os.environ.get('PORT', 5001))  # Changed default port to 5001
     # Get debug mode from environment
     debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
