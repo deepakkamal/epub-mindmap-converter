@@ -114,7 +114,7 @@ def _setup_pdf_styles():
         fontSize=20,
         spaceAfter=30,
         alignment=TA_CENTER,
-        textColor=darkblue,
+        textColor=black,
         fontName='Helvetica-Bold'
     ))
     
@@ -124,7 +124,7 @@ def _setup_pdf_styles():
         fontSize=16,
         spaceAfter=20,
         spaceBefore=20,
-        textColor=darkblue,
+        textColor=black,
         fontName='Helvetica-Bold'
     ))
     
@@ -176,10 +176,16 @@ def _add_chapter_content_to_pdf(story, chapter_data, chapter_name, styles):
     comprehensive_mindmap = mindmaps.get('comprehensive_mindmap') if mindmaps else None
     
     if comprehensive_mindmap:
+        # Add simple mindmap heading
+        story.append(Paragraph("Mindmap", styles['SectionHeading']))
+        story.append(Spacer(1, 0.1*inch))
         _add_mindmap_section_to_pdf(story, comprehensive_mindmap, styles)
     else:
         # Check if mindmap is stored at top level (wrong structure)
         if 'comprehensive_mindmap' in chapter_data:
+            # Add simple mindmap heading
+            story.append(Paragraph("Mindmap", styles['SectionHeading']))
+            story.append(Spacer(1, 0.1*inch))
             _add_mindmap_section_to_pdf(story, chapter_data['comprehensive_mindmap'], styles)
     
     # Add explanation section  
@@ -188,6 +194,9 @@ def _add_chapter_content_to_pdf(story, chapter_data, chapter_name, styles):
     
     # Add summary section
     if chapter_data.get('quick_summary'):
+        # Add simple summary heading
+        story.append(Paragraph("Summary", styles['SectionHeading']))
+        story.append(Spacer(1, 0.1*inch))
         _add_summary_section_to_pdf(story, chapter_data['quick_summary'], styles)
     
     # Add detailed analysis

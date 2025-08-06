@@ -167,7 +167,7 @@ class MindMapNotesGenerator:
         8. Structure with clear headings
         
         FORMAT:
-        # Mind Map Explanation: [Title]
+        # Mindmap
         
         ## Overview
         [2-3 sentences explaining what this chapter/document is about]
@@ -442,7 +442,7 @@ Analysis Data:
 - Actionable Takeaways: {json.dumps(synthesis.get('actionable_takeaways', []), indent=2)}
 
 Requirements:
-1. Start with "# Quick Summary: {title}"
+1. Start with "# Summary"
 2. Include a "## What's This About?" section with 2-3 substantial paragraphs
 3. Include a "## Core Concepts" section with 4-6 key concepts explained in 1-2 sentences each
 4. Include a "## Key Insights" section with 2-3 important insights
@@ -497,7 +497,7 @@ Traditional Analysis Data:
 - Actionable Takeaways: {json.dumps(synthesis.get('actionable_takeaways', []), indent=2)}
 
 ENHANCED SUMMARY REQUIREMENTS:
-1. Start with "# Comprehensive Summary: {title}"
+1. Start with "# Summary"
 
 2. **Executive Overview** (2-3 substantial paragraphs)
    - What this content is about and why it matters
@@ -559,7 +559,7 @@ Focus on creating a summary that not only informs but also teaches students HOW 
         metadata = results.get('metadata', {})
         title = metadata.get('title', 'Document')
         
-        summary = f"""# Quick Summary: {title}
+        summary = f"""# Summary
 
 ## What's This About?
 """

@@ -53,6 +53,10 @@ def _add_chapter_content(doc, chapter_data, chapter_name, is_main_title=False):
     
     # Add summary section
     if chapter_data.get('quick_summary'):
+        # Add simple summary heading
+        summary_heading = doc.add_paragraph()
+        summary_heading.style = doc.styles['Custom SubHeading']
+        summary_heading.add_run("Summary")
         _add_summary_section(doc, chapter_data['quick_summary'])
     
     # Add detailed analysis (was missing in combined docs!)
@@ -288,8 +292,8 @@ def _add_mindmap_section(doc, mindmap_content):
     """Add mindmap section with image or text fallback"""
     # Section heading
     heading = doc.add_paragraph()
-    heading.style = doc.styles['Custom Heading']
-    heading.add_run("Mind Map")
+    heading.style = doc.styles['Custom SubHeading']
+    heading.add_run("Mindmap")
     
     # Try to generate and add mindmap image
     image_added = False
