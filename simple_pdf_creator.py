@@ -176,16 +176,10 @@ def _add_chapter_content_to_pdf(story, chapter_data, chapter_name, styles):
     comprehensive_mindmap = mindmaps.get('comprehensive_mindmap') if mindmaps else None
     
     if comprehensive_mindmap:
-        # Add simple mindmap heading
-        story.append(Paragraph("Mindmap", styles['SectionHeading']))
-        story.append(Spacer(1, 0.1*inch))
         _add_mindmap_section_to_pdf(story, comprehensive_mindmap, styles)
     else:
         # Check if mindmap is stored at top level (wrong structure)
         if 'comprehensive_mindmap' in chapter_data:
-            # Add simple mindmap heading
-            story.append(Paragraph("Mindmap", styles['SectionHeading']))
-            story.append(Spacer(1, 0.1*inch))
             _add_mindmap_section_to_pdf(story, chapter_data['comprehensive_mindmap'], styles)
     
     # Add explanation section  

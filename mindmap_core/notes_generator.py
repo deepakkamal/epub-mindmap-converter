@@ -252,7 +252,6 @@ class MindMapNotesGenerator:
         9. Structure with clear headings that reflect the text structure
         
         ENHANCED FORMAT:
-        # Mind Map Explanation: [Title]
         
         ## Document Structure & Approach
         [Explain the primary text structure and how it helps understanding - 2-3 sentences]
@@ -296,10 +295,8 @@ class MindMapNotesGenerator:
         """
         title = metadata.get('title', 'Document Analysis')
         
-        # Add header information
-        formatted = f"""# Mind Map Explanation: {title}
-
----
+        # Add content without additional title (title will be added by calling code)
+        formatted = f"""---
 
 {notes_content}
 
@@ -324,9 +321,7 @@ class MindMapNotesGenerator:
         synthesis = results.get('synthesis', {})
         title = metadata.get('title', 'Document Analysis')
         
-        notes = f"""# Mind Map Explanation: {title}
-
-## Overview
+        notes = f"""## Overview
 This mind map represents the key concepts and insights extracted from the document using AI analysis.
 
 ## Main Themes
@@ -497,7 +492,7 @@ Traditional Analysis Data:
 - Actionable Takeaways: {json.dumps(synthesis.get('actionable_takeaways', []), indent=2)}
 
 ENHANCED SUMMARY REQUIREMENTS:
-1. Start with "# Summary"
+1. Start with "# Comprehensive Summary"
 
 2. **Executive Overview** (2-3 substantial paragraphs)
    - What this content is about and why it matters

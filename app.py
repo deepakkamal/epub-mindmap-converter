@@ -1326,7 +1326,7 @@ def download_chapter(chapter_name):
     
     # Add mindmap explanation
     if chapter_result.get('mindmap_explanation'):
-        content_lines.append("## Mindmap Explanation")
+        content_lines.append("# Mind Map Explanation:")
         content_lines.append("")
         content_lines.append(chapter_result['mindmap_explanation'])
         content_lines.append("")

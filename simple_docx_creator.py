@@ -290,11 +290,6 @@ def _setup_styles(doc):
 
 def _add_mindmap_section(doc, mindmap_content):
     """Add mindmap section with image or text fallback"""
-    # Section heading
-    heading = doc.add_paragraph()
-    heading.style = doc.styles['Custom SubHeading']
-    heading.add_run("Mindmap")
-    
     # Try to generate and add mindmap image
     image_added = False
     try:

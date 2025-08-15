@@ -420,6 +420,8 @@ class CAPTUREFramework:
            - Action items and next steps
            - Success metrics and indicators
         
+        IMPORTANT: Start with exactly "# Comprehensive Summary" as the title (do not include the chapter name in the title).
+        
         Write in clear, accessible language that helps students understand complex ideas.
         Aim for 600-800 words total. Use engaging headings and clear transitions.
         """
@@ -436,7 +438,7 @@ class CAPTUREFramework:
             
         except Exception as e:
             logger.error(f"Error generating comprehensive summary: {str(e)}")
-            return f"# Comprehensive Summary: {title}\n\nError generating detailed summary: {str(e)}"
+            return f"# Comprehensive Summary\n\nError generating detailed summary: {str(e)}"
     
     def _generate_explanation_strategies(self, synthesis: Dict[str, Any], title: str) -> Dict[str, Any]:
         """
@@ -507,7 +509,7 @@ class CAPTUREFramework:
     def _generate_fallback_summary(self, content: str, title: str) -> str:
         """Generate fallback summary if main analysis fails"""
         return f"""
-        # Comprehensive Summary: {title}
+        # Comprehensive Summary
         
         ## Overview
         This content covers important concepts and insights related to {title}.
