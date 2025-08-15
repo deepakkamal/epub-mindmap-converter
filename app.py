@@ -241,16 +241,16 @@ except ImportError as e:
     
     def get_available_models():
         return {
-            'gpt-4o-mini': {'name': 'GPT-4o Mini', 'output_cost': 0.60, 'description': 'Fastest and most affordable'},
-            'gpt-3.5-turbo': {'name': 'GPT-3.5 Turbo', 'output_cost': 1.50, 'description': 'Fast and efficient'}
+            'gpt-5-mini': {'name': 'GPT-5 Mini', 'input_cost': 0.12, 'output_cost': 0.48, 'description': 'Small, fast GPT-5'},
+            'gpt-4o': {'name': 'GPT-4o', 'input_cost': 2.50, 'output_cost': 10.00, 'description': 'High-intelligence GPT-4'}
         }
     
     def get_pricing_summary():
         return {
             'last_updated': datetime.now().isoformat(),
             'models': [
-                {'id': 'gpt-4o-mini', 'name': 'GPT-4o Mini', 'output_cost': 0.60, 'cost_formatted': '$0.60/1M tokens'},
-                {'id': 'gpt-3.5-turbo', 'name': 'GPT-3.5 Turbo', 'output_cost': 1.50, 'cost_formatted': '$1.50/1M tokens'}
+                {'id': 'gpt-5-mini', 'name': 'GPT-5 Mini', 'input_cost': 0.12, 'output_cost': 0.48, 'description': 'Small, fast GPT-5'},
+                {'id': 'gpt-4o', 'name': 'GPT-4o', 'input_cost': 2.50, 'output_cost': 10.00, 'description': 'High-intelligence GPT-4'}
             ],
             'total_models': 2
         }
@@ -431,7 +431,7 @@ class ProcessingManager:
                 'completed': True
             })
     def start_mindmap_processing(self, session_id: str, selected_chapters: List[str], 
-                                 ai_model: str = 'gpt-3.5-turbo', mindmap_type: str = 'comprehensive',
+                                 ai_model: str = 'gpt-5-mini', mindmap_type: str = 'comprehensive',
                                  api_key: str = None):
         """Start mindmap generation for selected chapters."""
         self.status[session_id] = {
@@ -456,7 +456,7 @@ class ProcessingManager:
         thread.start()
     
     def _process_mindmaps_worker(self, session_id: str, selected_chapters: List[str],
-                                ai_model: str = 'gpt-3.5-turbo', mindmap_type: str = 'comprehensive',
+                                ai_model: str = 'gpt-5-mini', mindmap_type: str = 'comprehensive',
                                 api_key: str = None):
         """Worker function for mindmap processing using direct integration (RAM-only)."""
         try:
@@ -990,19 +990,22 @@ def get_affordable_models():
             api_key = request.args.get('api_key', '').strip()
             force_refresh = request.args.get('force_refresh', 'false').lower() == 'true'
         
-        # Use user's API key to get fresh pricing data
+        # Use user's API key to get fresh pricing data (filtered for input cost < $11 and allowed families)
         pricing_summary = get_pricing_summary(api_key=api_key, force_refresh=force_refresh)
         
         # Convert to the format expected by the frontend
         models = []
         for model_info in pricing_summary['models']:
-            models.append({
-                'id': model_info['id'],
-                'name': model_info['name'],
-                'input_price': model_info.get('input_cost', 0),
-                'output_price': model_info['output_cost'],
-                'description': model_info.get('description', '')
-            })
+            # Only include GPT-4*, GPT-5*, and o3* here for extra safety
+            model_id_lower = model_info['id'].lower()
+            if model_id_lower.startswith('gpt-4') or model_id_lower.startswith('gpt-5') or model_id_lower.startswith('o3'):
+                models.append({
+                    'id': model_info['id'],
+                    'name': model_info['name'],
+                    'input_price': model_info.get('input_cost', 0),
+                    'output_price': model_info['output_cost'],
+                    'description': model_info.get('description', '')
+                })
         
         return jsonify({
             'models': models,
@@ -1211,7 +1214,7 @@ def process_mindmaps():
         
         data = request.get_json()
         selected_chapters = data.get('selected_chapters', [])
-        ai_model = data.get('ai_model', 'gpt-4o-mini')  # Default to cheapest model
+        ai_model = data.get('ai_model', 'gpt-5-mini')  # Default to cheapest allowed model
         mindmap_type = data.get('mindmap_type', 'comprehensive')
         
         if not selected_chapters:

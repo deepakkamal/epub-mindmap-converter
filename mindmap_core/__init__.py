@@ -29,7 +29,7 @@ class MindMapCreator:
         Initialize the Mind Map Creator
         
         Args:
-            model: AI model to use (gpt-3.5-turbo or gpt-4)
+            model: AI model to use (gpt-4, gpt-5, or o3-mini)
             api_key: OpenAI API key (optional, will use config/env if not provided)
             config: Configuration object (optional, will create default if not provided)
         """

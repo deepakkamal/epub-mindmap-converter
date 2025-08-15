@@ -36,23 +36,41 @@ class SharedModelConfig:
     
     # Default model configurations for cases where pricing manager is unavailable
     FALLBACK_MODEL_CONFIGS = {
-        "gpt-3.5-turbo": {
-            "max_tokens": 16000,
-            "cost_per_1k_tokens": 1.5,
-            "chunk_size": 10000,
-            "description": "Fast and efficient model for most tasks"
+        "gpt-5-mini": {
+            "max_tokens": 150000,
+            "cost_per_1k_tokens": 0.48,
+            "chunk_size": 22000,
+            "description": "Small, fast GPT-5 – most affordable general model"
+        },
+        "gpt-5o": {
+            "max_tokens": 200000,
+            "cost_per_1k_tokens": 4.0,
+            "chunk_size": 25000,
+            "description": "GPT-5 omni model for most tasks"
+        },
+        "gpt-5": {
+            "max_tokens": 200000,
+            "cost_per_1k_tokens": 8.0,
+            "chunk_size": 25000,
+            "description": "High-intelligence GPT-5 model"
         },
         "gpt-4o-mini": {
             "max_tokens": 128000,
             "cost_per_1k_tokens": 0.6,
             "chunk_size": 20000,
-            "description": "Fastest and most affordable model in the GPT-4o family"
+            "description": "Fastest and most affordable model in the GPT-4 family"
         },
-        "gpt-4o": {
-            "max_tokens": 128000,
-            "cost_per_1k_tokens": 10.0,
-            "chunk_size": 20000,
-            "description": "High-intelligence model for complex reasoning"
+        "gpt-4.1": {
+            "max_tokens": 150000,
+            "cost_per_1k_tokens": 8.0,
+            "chunk_size": 22000,
+            "description": "Latest GPT-4.1 model"
+        },
+        "o3-mini": {
+            "max_tokens": 200000,
+            "cost_per_1k_tokens": 5.0,
+            "chunk_size": 25000,
+            "description": "Affordable o3 reasoning model"
         }
     }
     
@@ -93,8 +111,12 @@ class SharedModelConfig:
         """Get max_tokens and chunk_size based on model type"""
         model_lower = model_id.lower()
         
-        # O1 series models (thinking models)
-        if any(x in model_lower for x in ['o1', 'o3']):
+        # O3 reasoning models
+        if 'o3' in model_lower:
+            return 200000, 25000
+            
+        # GPT-5 series
+        if 'gpt-5' in model_lower:
             return 200000, 25000
             
         # GPT-4.1 series
@@ -110,10 +132,6 @@ class SharedModelConfig:
             if 'turbo' in model_lower or 'preview' in model_lower:
                 return 128000, 20000
             return 8000, 6000
-            
-        # GPT-3.5 series
-        if 'gpt-3.5' in model_lower:
-            return 16000, 10000
             
         # Claude series
         if 'claude' in model_lower:

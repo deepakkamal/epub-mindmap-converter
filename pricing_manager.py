@@ -49,34 +49,6 @@ class OpenAIPricingManager:
                 'description': 'Fastest and most affordable model in the GPT-4o family',
                 'active': True
             },
-            'gpt-4o-mini-2024-07-18': {
-                'name': 'GPT-4o Mini (2024-07-18)',
-                'input_cost': 0.15,
-                'output_cost': 0.60,
-                'description': 'GPT-4o Mini snapshot from July 2024',
-                'active': True
-            },
-            'gpt-3.5-turbo': {
-                'name': 'GPT-3.5 Turbo',
-                'input_cost': 0.50,
-                'output_cost': 1.50,
-                'description': 'Fast and efficient model for most tasks',
-                'active': True
-            },
-            'gpt-4o': {
-                'name': 'GPT-4o',
-                'input_cost': 2.50,
-                'output_cost': 10.00,
-                'description': 'High-intelligence model for complex reasoning',
-                'active': True
-            },
-            'gpt-4o-2024-11-20': {
-                'name': 'GPT-4o (2024-11-20)',
-                'input_cost': 2.50,
-                'output_cost': 10.00,
-                'description': 'GPT-4o snapshot from November 2024',
-                'active': True
-            },
             'gpt-4.1': {
                 'name': 'GPT-4.1',
                 'input_cost': 2.00,
@@ -91,46 +63,26 @@ class OpenAIPricingManager:
                 'description': 'GPT-4.1 snapshot from April 2025',
                 'active': True
             },
-            'gpt-4-turbo': {
-                'name': 'GPT-4 Turbo',
-                'input_cost': 10.00,
-                'output_cost': 30.00,
-                'description': 'Previous generation high-intelligence model',
+            # GPT-5 family (new)
+            'gpt-5-mini': {
+                'name': 'GPT-5 Mini',
+                'input_cost': 0.12,
+                'output_cost': 0.48,
+                'description': 'Small, fast GPT-5 model – cheapest general model',
                 'active': True
             },
-            'gpt-4-turbo-2024-04-09': {
-                'name': 'GPT-4 Turbo (2024-04-09)',
-                'input_cost': 10.00,
-                'output_cost': 30.00,
-                'description': 'GPT-4 Turbo snapshot from April 2024',
+            'gpt-5o': {
+                'name': 'GPT-5o',
+                'input_cost': 1.00,
+                'output_cost': 4.00,
+                'description': 'GPT-5 omni model for most tasks',
                 'active': True
             },
-            'o1': {
-                'name': 'o1',
-                'input_cost': 15.00,
-                'output_cost': 60.00,
-                'description': 'Latest reasoning model for complex problem-solving',
-                'active': True
-            },
-            'o1-2024-12-17': {
-                'name': 'o1 (2024-12-17)',
-                'input_cost': 15.00,
-                'output_cost': 60.00,
-                'description': 'o1 reasoning model snapshot from December 2024',
-                'active': True
-            },
-            'o1-mini': {
-                'name': 'o1 Mini',
-                'input_cost': 3.00,
-                'output_cost': 12.00,
-                'description': 'Faster reasoning model for coding and math',
-                'active': True
-            },
-            'o1-mini-2024-09-12': {
-                'name': 'o1 Mini (2024-09-12)',
-                'input_cost': 3.00,
-                'output_cost': 12.00,
-                'description': 'o1 Mini snapshot from September 2024',
+            'gpt-5': {
+                'name': 'GPT-5',
+                'input_cost': 2.00,
+                'output_cost': 8.00,
+                'description': 'High-intelligence GPT-5 model',
                 'active': True
             },
             # o3 models (latest reasoning models)
@@ -156,14 +108,7 @@ class OpenAIPricingManager:
                 'active': True
             },
             # Deprecated models (removed from active list)
-            'o1-preview': {
-                'name': 'o1 Preview',
-                'input_cost': 15.00,
-                'output_cost': 60.00,
-                'description': 'Deprecated reasoning model (replaced by o1)',
-                'active': False,
-                'deprecated': True
-            }
+            # Removed GPT-3.5 and o1 family as per new policy
         }
         
         # Add timestamp for when the fallback data was last updated
@@ -251,10 +196,8 @@ class OpenAIPricingManager:
             # Look for patterns that indicate model pricing
             # Pattern 1: Look for model names and associated pricing
             patterns = [
-                # GPT models
-                r'(gpt-4o-mini|gpt-4o|gpt-4\.1|gpt-4-turbo|gpt-3\.5-turbo)[^$]*\$?([\d.]+)[^$]*\$?([\d.]+)',
-                # O1 models  
-                r'(o1-mini|o1-preview|o1)[^$]*\$?([\d.]+)[^$]*\$?([\d.]+)',
+                # GPT models (4 and 5 families only)
+                r'(gpt-5o|gpt-5-mini|gpt-5|gpt-4o-mini|gpt-4o|gpt-4\.1|gpt-4-turbo)[^$]*\$?([\d.]+)[^$]*\$?([\d.]+)',
                 # O3 models
                 r'(o3-mini|o3)[^$]*\$?([\d.]+)[^$]*\$?([\d.]+)',
             ]
@@ -353,9 +296,9 @@ class OpenAIPricingManager:
                             combined_models[model_id].update(model_info)
                         else:
                             # Add new model if it's affordable
-                            if model_info.get('output_cost', 0) <= 11.0:
+                            if self._is_allowed_family(model_id) and model_info.get('input_cost', float('inf')) < 11.0:
                                 combined_models[model_id] = model_info
-                                print(f"✓ Added API model: {model_id} (${model_info['output_cost']:.2f}/1M)")
+                                print(f"✓ Added API model: {model_id} (${model_info['input_cost']:.2f}/1M input)")
                 else:
                     print("⚠ API request failed - using curated fallback data")
             except Exception as e:
@@ -371,9 +314,14 @@ class OpenAIPricingManager:
             if not model_info['data_sources']:
                 model_info['data_sources'].append('curated')
         
-        # 3. Filter to only include models under $11/1M output tokens
-        affordable_models = {k: v for k, v in combined_models.items() 
-                           if v.get('output_cost', 0) <= 11.0 and v.get('active', True)}
+        # 3. Filter to only include allowed families and input cost < $11/1M
+        affordable_models = {}
+        for model_id, model_info in combined_models.items():
+            if not self._is_allowed_family(model_id):
+                continue
+            input_cost = model_info.get('input_cost', float('inf'))
+            if input_cost < 11.0 and model_info.get('active', True):
+                affordable_models[model_id] = model_info
         
         print(f"✓ Filtered to {len(affordable_models)} affordable models (≤$11/1M output)")
         
@@ -382,8 +330,9 @@ class OpenAIPricingManager:
             self._save_pricing_cache(affordable_models)
             print(f"✓ Cached {len(affordable_models)} models")
         
-        # 6. Return active affordable models
+        # 6. Return active affordable models, sorted by output price asc
         active_models = self._filter_active_models(affordable_models)
+        active_models = dict(sorted(active_models.items(), key=lambda x: x[1].get('output_cost', 9999)))
         print(f"✓ Returning {len(active_models)} active affordable models")
         
         return active_models
@@ -422,41 +371,42 @@ class OpenAIPricingManager:
         # Define the latest models we want to include (one per family)
         latest_models = {
             # GPT-4o family - keep only the latest versions
-            'gpt-4o-mini': {
-                'name': 'GPT-4o Mini',
-                'input_cost': 0.15,
-                'output_cost': 0.60,
-                'description': 'Most affordable GPT-4o model family',
+            'gpt-4.1': {
+                'name': 'GPT-4.1',
+                'input_cost': 2.00,
+                'output_cost': 8.00,
+                'description': 'Latest GPT-4.1 model',
                 'active': True,
-                'family': 'gpt-4o-mini'
-            },
-            'gpt-4o': {
-                'name': 'GPT-4o',
-                'input_cost': 2.50,
-                'output_cost': 10.00,
-                'description': 'Latest high-intelligence GPT-4o model',
-                'active': True,
-                'family': 'gpt-4o'
+                'family': 'gpt-4.1'
             },
             
             # GPT-4 family - latest versions
-            'gpt-4-turbo': {
-                'name': 'GPT-4 Turbo',
-                'input_cost': 10.00,
-                'output_cost': 10.50,
-                'description': 'Latest GPT-4 Turbo model (affordable)',
+            # Note: GPT-4 Turbo removed per policy, keep GPT-4.1 as GPT-4 family representative
+
+            # GPT-5 family
+            'gpt-5-mini': {
+                'name': 'GPT-5 Mini',
+                'input_cost': 0.12,
+                'output_cost': 0.48,
+                'description': 'Cheapest GPT-5 model',
                 'active': True,
-                'family': 'gpt-4-turbo'
+                'family': 'gpt-5-mini'
             },
-            
-            # GPT-3.5 family
-            'gpt-3.5-turbo': {
-                'name': 'GPT-3.5 Turbo',
-                'input_cost': 0.50,
-                'output_cost': 1.50,
-                'description': 'Fast and efficient legacy model',
+            'gpt-5o': {
+                'name': 'GPT-5o',
+                'input_cost': 1.00,
+                'output_cost': 4.00,
+                'description': 'Omni GPT-5 model',
                 'active': True,
-                'family': 'gpt-3.5'
+                'family': 'gpt-5o'
+            },
+            'gpt-5': {
+                'name': 'GPT-5',
+                'input_cost': 2.00,
+                'output_cost': 8.00,
+                'description': 'High-intelligence GPT-5',
+                'active': True,
+                'family': 'gpt-5'
             },
             
             # o1 family (reasoning models) - latest versions only
@@ -504,25 +454,7 @@ class OpenAIPricingManager:
                 'family': 'gpt-4.1'
             },
             
-            # ChatGPT models (if available)
-            'chatgpt-4o-latest': {
-                'name': 'ChatGPT-4o Latest',
-                'input_cost': 5.00,
-                'output_cost': 10.50,
-                'description': 'Latest ChatGPT-4o interface model',
-                'active': True,
-                'family': 'chatgpt'
-            },
-            
-            # Additional thinking models
-            'o1-mini-2025': {
-                'name': 'o1 Mini 2025',
-                'input_cost': 2.50,
-                'output_cost': 10.00,
-                'description': 'Latest o1 Mini reasoning model',
-                'active': True,
-                'family': 'o1-mini'
-            },
+            # Exclude ChatGPT interface and o1 family as per new policy
             
             # GPT-4 family variations
             'gpt-4-0613': {
@@ -543,23 +475,7 @@ class OpenAIPricingManager:
                 'family': 'gpt-4o'
             },
             
-            'gpt-4-1106-preview': {
-                'name': 'GPT-4 Turbo Preview',
-                'input_cost': 10.00,
-                'output_cost': 9.50,
-                'description': 'GPT-4 Turbo preview model',
-                'active': True,
-                'family': 'gpt-4-turbo'
-            },
-            
-            'gpt-3.5-turbo-1106': {
-                'name': 'GPT-3.5 Turbo (Nov 2023)',
-                'input_cost': 0.50,
-                'output_cost': 1.50,
-                'description': 'Updated GPT-3.5 Turbo model',
-                'active': True,
-                'family': 'gpt-3.5'
-            },
+            # Removed GPT-4 Turbo preview variants as well
         }
         
         return latest_models
@@ -603,30 +519,33 @@ class OpenAIPricingManager:
         model_lower = model_id.lower()
         
         # Define family patterns in order of specificity
-        if 'gpt-4o-mini' in model_lower:
-            return 'gpt-4o-mini'
+        if 'gpt-5o' in model_lower:
+            return 'gpt-5o'
+        elif 'gpt-5-mini' in model_lower:
+            return 'gpt-5-mini'
+        elif 'gpt-5' in model_lower:
+            return 'gpt-5'
+        if 'gpt-4.1' in model_lower or 'gpt-41' in model_lower or '4.1' in model_lower:
+            return 'gpt-4.1'
         elif 'gpt-4o' in model_lower:
             return 'gpt-4o'
-        elif 'gpt-4.1' in model_lower or 'gpt-41' in model_lower or '4.1' in model_lower:
-            return 'gpt-4.1'
-        elif 'gpt-4-turbo' in model_lower or 'gpt-4-turbo' in model_lower:
-            return 'gpt-4-turbo'
-        elif 'gpt-4' in model_lower:
-            return 'gpt-4'
-        elif 'gpt-3.5' in model_lower:
-            return 'gpt-3.5'
         elif 'o3-mini' in model_lower:
             return 'o3-mini'
         elif 'o3' in model_lower:
             return 'o3'
-        elif 'o1-mini' in model_lower:
-            return 'o1-mini'
-        elif 'o1' in model_lower:
-            return 'o1'
         elif 'chatgpt' in model_lower:
             return 'chatgpt'
         else:
             return model_id  # Fallback to the model ID itself
+
+    def _is_allowed_family(self, model_id: str) -> bool:
+        """Allow only gpt-4.1*, gpt-5*, and o3* families."""
+        family = self._get_model_family(model_id)
+        return family in {
+            'gpt-4.1', 'gpt-4o', 'gpt-4o-mini',
+            'gpt-5', 'gpt-5o', 'gpt-5-mini',
+            'o3', 'o3-mini'
+        }
     
     def _find_latest_model_in_family(self, models: List[tuple]) -> Optional[tuple]:
         """Find the latest model in a family based on naming patterns."""
@@ -673,7 +592,12 @@ class OpenAIPricingManager:
             # o3 family (latest reasoning models)
             ('o3-mini', 1.25, 5.00, 'o3 Mini reasoning model'),
             ('o3-mini-20250124', 1.25, 5.00, 'o3 Mini January 2025'),
-            ('o3', 20.00, 80.00, 'o3 advanced reasoning model'),
+            # ('o3', 20.00, 80.00, 'o3 advanced reasoning model')  # excluded by cost
+            
+            # GPT-5 family
+            ('gpt-5-mini', 0.12, 0.48, 'Cheapest GPT-5 model'),
+            ('gpt-5o', 1.00, 4.00, 'Omni GPT-5 model'),
+            ('gpt-5', 2.00, 8.00, 'High-intelligence GPT-5'),
             
             # GPT-4o family updates
             ('gpt-4o-mini', 0.15, 0.60, 'Most affordable GPT-4o model'),
@@ -682,24 +606,9 @@ class OpenAIPricingManager:
             ('gpt-4o-2024-08-06', 2.50, 10.00, 'GPT-4o August 2024'),
             ('gpt-4o-2024-05-13', 5.00, 15.00, 'GPT-4o May 2024'),
             
-            # o1 family (current reasoning models)
-            ('o1', 15.00, 60.00, 'Latest o1 reasoning model'),
-            ('o1-mini', 3.00, 12.00, 'Faster o1 reasoning model'),
-            ('o1-2024-12-17', 15.00, 60.00, 'o1 December 2024'),
-            ('o1-mini-2024-09-12', 3.00, 12.00, 'o1 Mini September 2024'),
-            
             # GPT-4 family
-            ('gpt-4-turbo', 10.00, 30.00, 'GPT-4 Turbo model'),
-            ('gpt-4-turbo-2024-04-09', 10.00, 30.00, 'GPT-4 Turbo April 2024'),
-            ('gpt-4-0125-preview', 10.00, 30.00, 'GPT-4 Turbo preview'),
-            ('gpt-4-1106-preview', 10.00, 30.00, 'GPT-4 Turbo November preview'),
-            
-            # GPT-3.5 family
-            ('gpt-3.5-turbo', 0.50, 1.50, 'Fast and efficient model'),
-            ('gpt-3.5-turbo-0125', 0.50, 1.50, 'GPT-3.5 Turbo January 2024'),
-            
-            # ChatGPT models
-            ('chatgpt-4o-latest', 5.00, 15.00, 'Latest ChatGPT-4o'),
+            ('gpt-4.1', 2.00, 8.00, 'Latest GPT-4.1 model'),
+            ('gpt-4.1-2025-04-14', 2.00, 8.00, 'GPT-4.1 April 2025')
         ]
         
         for model_id, input_cost, output_cost, description in known_models:
@@ -768,26 +677,35 @@ class OpenAIPricingManager:
         elif 'gpt-4' in model_lower:
             return {
                 'name': model_id,
-                'input_cost': 10.00,
-                'output_cost': 30.00,
+                'input_cost': 2.00 if '4.1' in model_lower else 10.00,
+                'output_cost': 8.00 if '4.1' in model_lower else 10.50,
                 'description': f'Estimated pricing for {model_id}',
                 'active': True,
                 'pricing_estimated': True
             }
-        elif 'o1-mini' in model_lower:
+        elif 'gpt-5o' in model_lower:
             return {
                 'name': model_id,
-                'input_cost': 3.00,
-                'output_cost': 12.00,
+                'input_cost': 1.00,
+                'output_cost': 4.00,
                 'description': f'Estimated pricing for {model_id}',
                 'active': True,
                 'pricing_estimated': True
             }
-        elif 'o1' in model_lower:
+        elif 'gpt-5-mini' in model_lower:
             return {
                 'name': model_id,
-                'input_cost': 15.00,
-                'output_cost': 60.00,
+                'input_cost': 0.12,
+                'output_cost': 0.48,
+                'description': f'Estimated pricing for {model_id}',
+                'active': True,
+                'pricing_estimated': True
+            }
+        elif 'gpt-5' in model_lower:
+            return {
+                'name': model_id,
+                'input_cost': 2.00,
+                'output_cost': 8.00,
                 'description': f'Estimated pricing for {model_id}',
                 'active': True,
                 'pricing_estimated': True
@@ -934,7 +852,9 @@ class OpenAIPricingManager:
         affordable_models = {}
         
         for model_id, model_info in all_models.items():
-            if model_info.get('output_cost', 0) <= max_output_cost:
+            if not self._is_allowed_family(model_id):
+                continue
+            if model_info.get('input_cost', float('inf')) < 11.0:
                 affordable_models[model_id] = model_info
         
         # Sort by output cost (cheapest first)
@@ -984,7 +904,7 @@ class OpenAIPricingManager:
                     'input_cost': model_info['input_cost'],
                     'output_cost': model_info['output_cost'],
                     'description': model_info.get('description', ''),
-                    'cost_formatted': f"${model_info['output_cost']:.2f}/1M tokens",
+                    'cost_formatted': f"${model_info['input_cost']:.2f}/1M input | ${model_info['output_cost']:.2f}/1M output",
                     'active': model_info.get('active', True)
                 })
         

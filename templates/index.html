@@ -927,7 +927,7 @@
                             <div id="pricing-info" class="pricing-container">
                                 <div class="text-center">
                                     <div class="loading"></div>
-                                    <p class="small mt-2 mb-0">Loading affordable models...</p>
+                                    <p class="small mt-2 mb-0">Loading eligible models (input < $11/1M)...</p>
                                 </div>
                             </div>
                         </div>
@@ -935,7 +935,7 @@
                     
                     <!-- Model Selection -->
                     <div class="mt-3" id="model-selection" style="display: none;">
-                        <h5><i class="fas fa-robot"></i> Select AI Model</h5>
+                        <h5><i class="fas fa-robot"></i> Select AI Model (GPT-4, GPT-5, or o3; input < $11/1M)</h5>
                         <div id="model-options">
                             <!-- Models will be populated here -->
                         </div>
@@ -1311,7 +1311,7 @@
                     pricingInfo.innerHTML = `
                         <div class="text-center text-warning">
                             <i class="fas fa-exclamation-triangle"></i>
-                            <p class="small mt-2 mb-0">No affordable models found (under $11/1M tokens)</p>
+                            <p class="small mt-2 mb-0">No eligible models found (input < $11/1M)</p>
                         </div>
                     `;
                 }
@@ -1335,10 +1335,10 @@
             pricingInfo.innerHTML = `
                 <div class="text-center">
                     <div class="mb-2">
-                        <strong>${count}</strong> affordable models available
+                        <strong>${count}</strong> eligible models available
                     </div>
                     <div class="small text-muted">
-                        Starting from <strong>$${cheapest.output_price}/1M tokens</strong>
+                        Starting from <strong>$${cheapest.output_price}/1M output</strong> (input < $11/1M)
                     </div>
                 </div>
             `;
@@ -1352,7 +1352,7 @@
                     <div class="model-badge">Selected</div>
                     <div>
                         <div class="model-name">${model.name || model.id}</div>
-                        <div class="model-price">$${model.output_price}/1M tokens</div>
+                        <div class="model-price">$${model.input_price}/1M input · $${model.output_price}/1M output</div>
                         <div class="model-description">${model.description || 'AI language model for text generation'}</div>
                     </div>
                 </div>

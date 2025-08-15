@@ -31,7 +31,7 @@ class Config:
     
     # API Settings
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-    DEFAULT_MODEL = os.getenv("DEFAULT_MODEL", "gpt-4o-mini")
+    DEFAULT_MODEL = os.getenv("DEFAULT_MODEL", "gpt-5-mini")
     
     # Processing Settings
     MAX_TOKENS_PER_CHUNK = int(os.getenv("MAX_TOKENS_PER_CHUNK", "8000"))
@@ -75,17 +75,17 @@ class Config:
         else:
             # Enhanced fallback with more models when web interface not available
             return {
-                "gpt-4o-mini": {
-                    "max_tokens": 128000,
-                    "cost_per_1k_tokens": 0.6,
-                    "chunk_size": 20000,
-                    "description": "Fastest and most affordable model"
+                "gpt-5-mini": {
+                    "max_tokens": 150000,
+                    "cost_per_1k_tokens": 0.48,
+                    "chunk_size": 22000,
+                    "description": "Small, fast GPT-5 – most affordable general model"
                 },
-                "gpt-3.5-turbo": {
-                    "max_tokens": 16000,
-                    "cost_per_1k_tokens": 1.5,
-                    "chunk_size": 10000,
-                    "description": "Fast and efficient model"
+                "gpt-5o": {
+                    "max_tokens": 200000,
+                    "cost_per_1k_tokens": 4.0,
+                    "chunk_size": 25000,
+                    "description": "GPT-5 omni model for most tasks"
                 },
                 "gpt-4.1": {
                     "max_tokens": 150000,
@@ -93,23 +93,12 @@ class Config:
                     "chunk_size": 22000,
                     "description": "Latest GPT-4.1 model"
                 },
-                "gpt-4o": {
-                    "max_tokens": 128000,
-                    "cost_per_1k_tokens": 10.0,
-                    "chunk_size": 20000,
-                    "description": "High-intelligence model"
-                },
+                
                 "o3-mini": {
                     "max_tokens": 200000,
                     "cost_per_1k_tokens": 5.0,
                     "chunk_size": 25000,
                     "description": "O3 mini reasoning model"
-                },
-                "o1-mini-2025": {
-                    "max_tokens": 150000,
-                    "cost_per_1k_tokens": 10.0,
-                    "chunk_size": 22000,
-                    "description": "O1 mini model 2025 version"
                 }
             }
     
